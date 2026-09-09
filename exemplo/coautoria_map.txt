@@ -1,0 +1,61 @@
+id	label	weight<Documents>	weight<Links>	weight<Total link strength>	score<Avg. pub. year>
+1	Prashant Mavani	3	0	0	2026.00
+2	Byunghyun Ban	3	0	0	2026.00
+3	Xavier Pillet	3	0	0	2026.00
+4	Fan Yang	2	0	0	2021.00
+5	Tymoteusz Miller	2	1	2	2023.50
+6	Irmina Durlik	2	1	2	2023.50
+7	Michalis P. Michaelides	2	9	18	2025.00
+8	Andreas C. Aristotelous	2	9	18	2025.00
+9	Álvaro Martínez	2	9	18	2025.00
+10	Herodotos Herodotou	2	9	18	2025.00
+11	Alejandro Leonardo García Navarro	2	9	18	2025.00
+12	Alvaro Martınez-Romero	2	9	18	2025.00
+13	Sheraz Aslam	2	9	18	2025.00
+14	Eduardo Garro	2	9	18	2025.00
+15	Alessandro Cassera	2	9	18	2025.00
+16	Kyriacos Orphanides	2	9	18	2025.00
+17	Said Mazaheri	2	3	6	2023.00
+18	Sujeeva Setunge	2	3	6	2023.00
+19	Farham Shahrivar	2	3	6	2023.00
+20	Mojtaba Mahmoodian	2	3	6	2023.00
+21	Manoj Samal	2	1	2	2024.50
+22	Mithun Mondal	2	1	2	2024.50
+23	Andrew Oladugba	2	0	0	2024.50
+24	Derma Watty Sihombing	2	0	0	2025.00
+25	Rukaiya Rukaiya	2	4	8	2026.00
+26	Shoab Khan	2	4	8	2026.00
+27	Nayab Asim	2	4	8	2026.00
+28	Irum Matloob	2	4	8	2026.00
+29	Zaid Khan	2	4	8	2026.00
+30	Rita Margaretha	2	2	4	2024.50
+31	Mohammad Syuzairi	2	2	4	2024.50
+32	Mahadiansar Mahadiansar	2	2	4	2024.50
+33	IJRAME Journal	2	0	0	2026.00
+34	Sujal Santosh Jaiswal	2	0	0	2026.00
+35	Elnaz Hadjiloo	2	2	4	2026.00
+36	Dagmara Klos	2	2	4	2026.00
+37	Kacper Cerek	2	2	4	2026.00
+38	Jorge Melero Corell	2	0	0	2026.00
+39	Allister Mannion	2	0	0	2017.00
+40	Qiang Liu	2	0	0	2025.50
+41	Ahmed Raafat	2	0	0	2026.00
+42	Ali Sarabi	2	1	2	2026.00
+43	Qing Zou	2	1	2	2026.00
+44	Ekerete Adiaiduo	2	2	4	2026.00
+45	Emmanuel Udoiwod	2	2	4	2026.00
+46	Michael Paul Esu	2	2	4	2026.00
+47	Yang Shao	2	6	12	2026.00
+48	Qi Zhu	2	6	12	2026.00
+49	Deyu Zhuang	2	6	12	2026.00
+50	Daoqiang Zhang	2	6	12	2026.00
+51	舒丽媛	2	6	12	2026.00
+52	Peiliang Gong	2	6	12	2026.00
+53	Xiaoli Li	2	6	12	2026.00
+54	Omar Khaled	2	3	6	2026.00
+55	Malek Rekik	2	3	6	2026.00
+56	Yingjie Tang	2	3	6	2026.00
+57	Matthew A. Franchek	2	3	6	2026.00
+58	Sujai Balasubramaniam	2	0	0	2026.00
+59	Diego E. Aparicio	2	1	2	2025.00
+60	Luis A. Alfaro	2	1	2	2025.00

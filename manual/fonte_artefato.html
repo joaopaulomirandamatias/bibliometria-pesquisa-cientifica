@@ -1,0 +1,1596 @@
+<meta charset="utf-8">
+<title>MirandasTech · Bibliometria com VOSviewer e Bibliometrix</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+
+:root{
+  --paper:#F1F4F7; --surface:#FFFFFF; --surface-2:#F8FAFB;
+  --ink:#101720; --ink-2:#4A5866; --ink-3:#75828E;
+  --rule:#D3DAE1; --rule-2:#E5EAEF;
+  --blueprint:#17436B; --blueprint-2:#2C6396; --blueprint-soft:#E4EDF5;
+  --signal:#C4530E; --signal-soft:#FBEADD;
+  --go:#186B50; --go-soft:#E0EFE9;
+  --stop:#A0231C; --stop-soft:#F9E5E3;
+  --amber:#8A6000; --amber-soft:#F9EFD6;
+  --shadow:0 1px 2px rgba(16,23,32,.06),0 8px 24px -12px rgba(16,23,32,.18);
+  --serif:'Spectral',Georgia,'Times New Roman',serif;
+  --cond:'IBM Plex Sans Condensed','Helvetica Neue',Arial,sans-serif;
+  --mono:'IBM Plex Mono','SFMono-Regular',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1218; --surface:#131B23; --surface-2:#182129;
+    --ink:#E3E9EF; --ink-2:#94A3B1; --ink-3:#71808E;
+    --rule:#26313C; --rule-2:#1E2831;
+    --blueprint:#7DB2DF; --blueprint-2:#A3CAEB; --blueprint-soft:#15283A;
+    --signal:#EE8A46; --signal-soft:#33200F;
+    --go:#54C398; --go-soft:#0F2620;
+    --stop:#EC7B72; --stop-soft:#2D1614;
+    --amber:#DCAC3D; --amber-soft:#2A2110;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1218; --surface:#131B23; --surface-2:#182129;
+  --ink:#E3E9EF; --ink-2:#94A3B1; --ink-3:#71808E;
+  --rule:#26313C; --rule-2:#1E2831;
+  --blueprint:#7DB2DF; --blueprint-2:#A3CAEB; --blueprint-soft:#15283A;
+  --signal:#EE8A46; --signal-soft:#33200F;
+  --go:#54C398; --go-soft:#0F2620;
+  --stop:#EC7B72; --stop-soft:#2D1614;
+  --amber:#DCAC3D; --amber-soft:#2A2110;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.7;-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+:focus-visible{outline:2px solid var(--blueprint-2);outline-offset:3px;border-radius:2px}
+
+/* ---------- sections ---------- */
+.part{padding-top:56px}
+.part-head{display:flex;align-items:baseline;gap:14px;border-top:1px solid var(--rule);padding-top:14px;margin-bottom:8px}
+.part-num{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--signal);font-weight:600}
+.part-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+h2{font-family:var(--cond);font-weight:700;font-size:clamp(27px,3.6vw,38px);line-height:1.12;letter-spacing:-.012em;margin:6px 0 0;text-wrap:balance;max-width:22ch}
+h3{font-family:var(--cond);font-weight:600;font-size:22px;line-height:1.25;margin:40px 0 0;color:var(--ink);text-wrap:balance}
+h4{font-family:var(--cond);font-weight:600;font-size:17px;line-height:1.3;margin:26px 0 0;color:var(--blueprint);letter-spacing:.01em}
+p,ul,ol{max-width:68ch}
+p{margin:14px 0 0}
+ul,ol{margin:14px 0 0;padding-left:22px}
+li{margin:7px 0}
+li::marker{color:var(--blueprint)}
+strong{font-weight:600;color:var(--ink)}
+em{font-style:italic}
+a{color:var(--blueprint);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+code{font-family:var(--mono);font-size:.855em;background:var(--surface-2);border:1px solid var(--rule-2);padding:1px 5px;border-radius:3px;color:var(--ink)}
+.dek{font-size:18px;color:var(--ink-2);max-width:64ch;margin:16px 0 0;line-height:1.6}
+
+/* ---------- blocks ---------- */
+.rule-box,.trap,.case,.note{margin:24px 0 0;padding:16px 20px;border-radius:4px;max-width:74ch;border-left:3px solid}
+.rule-box{background:var(--blueprint-soft);border-left-color:var(--blueprint)}
+.trap{background:var(--signal-soft);border-left-color:var(--signal)}
+.case{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--go)}
+.note{background:var(--surface-2);border-left-color:var(--ink-3)}
+.blabel{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;font-weight:600;display:block;margin-bottom:7px}
+.rule-box .blabel{color:var(--blueprint)}
+.trap .blabel{color:var(--signal)}
+.case .blabel{color:var(--go)}
+.note .blabel{color:var(--ink-3)}
+.rule-box p:first-of-type,.trap p:first-of-type,.case p:first-of-type,.note p:first-of-type{margin-top:0}
+.rule-box p,.trap p,.case p,.rule-box li,.trap li,.case li,.note p,.note li{max-width:none;font-size:16px}
+.case .src{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:10px;display:block;line-height:1.5}
+
+/* ---------- figures ---------- */
+figure{margin:34px 0 0;max-width:none}
+figcaption{font-family:var(--cond);font-size:13.5px;color:var(--ink-2);margin-top:11px;line-height:1.5;max-width:76ch}
+figcaption b{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--signal);font-weight:600;margin-right:7px}
+.frame{border:1px solid var(--rule);background:var(--surface);border-radius:4px;padding:24px;overflow-x:auto}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto;margin:26px 0 0;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:var(--cond);font-size:14.5px;min-width:520px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:11px 14px;border-bottom:1px solid var(--rule);background:var(--surface-2);vertical-align:bottom}
+td{padding:11px 14px;border-bottom:1px solid var(--rule-2);vertical-align:top;line-height:1.45;color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+td.mono{font-family:var(--mono);font-size:12.5px}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;font-weight:600;text-transform:uppercase;padding:2.5px 8px;border-radius:20px;white-space:nowrap}
+.p-go{background:var(--go-soft);color:var(--go)}
+.p-amber{background:var(--amber-soft);color:var(--amber)}
+.p-stop{background:var(--stop-soft);color:var(--stop)}
+.p-blue{background:var(--blueprint-soft);color:var(--blueprint)}
+
+/* ---------- terminal ---------- */
+.term{background:#0B1219;border:1px solid #223040;border-radius:5px;overflow:hidden;margin:26px 0 0}
+.term-bar{display:flex;align-items:center;gap:7px;padding:8px 13px;background:#141F2B;border-bottom:1px solid #223040}
+.term-dot{width:9px;height:9px;border-radius:50%;background:#33445A}
+.term-title{font-family:var(--mono);font-size:10.5px;color:#7A8B9C;margin-left:8px;letter-spacing:.05em}
+.term pre{margin:0;padding:15px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.62;color:#C9D6E2}
+.term .c-p{color:#5FA8DC}
+.term .c-o{color:#E8A055}
+.term .c-g{color:#5FC79A}
+.term .c-m{color:#71828F}
+.term .c-r{color:#E8776C}
+
+/* ---------- code ---------- */
+.code{background:var(--surface-2);border:1px solid var(--rule);border-radius:4px;margin:24px 0 0;overflow:hidden}
+.code-head{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);padding:8px 14px;border-bottom:1px solid var(--rule);background:var(--surface)}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.66;color:var(--ink)}
+.code .k{color:var(--blueprint);font-weight:500}
+.code .s{color:var(--go)}
+.code .cm{color:var(--ink-3);font-style:italic}
+
+/* ---------- charts ---------- */
+.bars{display:flex;flex-direction:column;gap:11px;margin:0}
+.bar-row{display:grid;grid-template-columns:minmax(96px,152px) minmax(0,1fr) 62px;gap:12px;align-items:center}
+.bar-lab{font-family:var(--cond);font-size:13.5px;color:var(--ink-2);line-height:1.25;text-align:right}
+.bar-track{background:var(--rule-2);border-radius:2px;height:22px;position:relative;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;background:var(--blueprint)}
+.bar-fill.f-signal{background:var(--signal)}
+.bar-fill.f-go{background:var(--go)}
+.bar-fill.f-stop{background:var(--stop)}
+.bar-fill.f-amber{background:var(--amber)}
+.bar-fill.f-mute{background:var(--ink-3)}
+.bar-val{font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right;font-weight:500}
+.bar-zero{font-family:var(--mono);font-size:11px;color:var(--stop);font-weight:600;position:absolute;left:4px;top:50%;transform:translateY(-50%)}
+@media (max-width:560px){.bar-row{grid-template-columns:minmax(72px,102px) minmax(0,1fr) 52px;gap:8px}.bar-lab{font-size:12px}}
+
+/* funnel */
+.funnel{display:flex;flex-direction:column;gap:8px;align-items:center}
+.fstep{border:1px solid var(--rule);background:var(--surface-2);border-radius:4px;padding:12px 18px;text-align:center;width:100%;max-width:640px;position:relative}
+.fstep .fn{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+.fstep .ft{font-family:var(--cond);font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.35}
+.fstep.hl{border-color:var(--signal);background:var(--signal-soft)}
+.fstep.hl .fn{color:var(--signal)}
+.fdrop{font-family:var(--mono);font-size:11.5px;color:var(--stop);text-align:center;line-height:1.4}
+
+/* flow map */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px}
+.node{border:1px solid var(--rule);border-radius:4px;background:var(--surface-2);padding:12px 13px;display:flex;flex-direction:column;gap:6px}
+.node .nn{font-family:var(--mono);font-size:10px;letter-spacing:.11em;color:var(--ink-3);font-weight:600}
+.node .nt{font-family:var(--cond);font-size:15px;font-weight:600;line-height:1.22;color:var(--ink)}
+.node .nd{font-size:13px;color:var(--ink-2);line-height:1.45;font-family:var(--cond)}
+.node .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.node.gate{border-color:var(--stop);background:var(--stop-soft)}
+.node.gate .nn{color:var(--stop)}
+
+/* two-column compare */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden;background:var(--surface)}
+.compare>div{padding:18px 20px}
+.compare>div:first-child{border-right:1px solid var(--rule)}
+.cmp-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.compare ul{margin:0;padding-left:18px;max-width:none}
+.compare li{font-family:var(--cond);font-size:14.5px;line-height:1.45;margin:8px 0;color:var(--ink)}
+@media (max-width:640px){.compare{grid-template-columns:1fr}.compare>div:first-child{border-right:0;border-bottom:1px solid var(--rule)}}
+
+/* ui schematic */
+.ui{border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:var(--surface);font-family:var(--cond)}
+.ui-bar{background:var(--surface-2);border-bottom:1px solid var(--rule);padding:7px 12px;font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center}
+.ui-body{display:grid;grid-template-columns:170px minmax(0,1fr);min-height:150px}
+.ui-side{border-right:1px solid var(--rule);padding:10px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}
+.ui-side div{padding:3.5px 6px;border-radius:3px;line-height:1.3}
+.ui-side div.sel{background:var(--blueprint-soft);color:var(--blueprint);font-weight:600}
+.ui-main{padding:10px}
+.ui-row{display:grid;grid-template-columns:minmax(0,1fr) 78px 46px;gap:9px;padding:6px 7px;border-bottom:1px solid var(--rule-2);font-size:13px;align-items:center;color:var(--ink)}
+.ui-row.head{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule)}
+.ui-row span:nth-child(2),.ui-row span:nth-child(3){font-family:var(--mono);font-size:11.5px;color:var(--ink-2)}
+.schematic-tag{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);border:1px dashed var(--rule);padding:2px 7px;border-radius:3px}
+@media (max-width:560px){.ui-body{grid-template-columns:1fr}.ui-side{border-right:0;border-bottom:1px solid var(--rule)}}
+
+/* checklist */
+.check{border:1px solid var(--rule);border-radius:4px;background:var(--surface);overflow:hidden}
+.check-item{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--rule-2)}
+.check-item:last-child{border-bottom:0}
+.check-item input{margin:4px 0 0;width:16px;height:16px;accent-color:var(--blueprint);flex:none;cursor:pointer}
+.check-item label{font-family:var(--cond);font-size:14.5px;line-height:1.45;cursor:pointer;color:var(--ink)}
+.check-item label b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.check-item.done label{color:var(--ink-3);text-decoration:line-through}
+.check-foot{padding:10px 16px;background:var(--surface-2);border-top:1px solid var(--rule);font-family:var(--mono);font-size:11px;color:var(--ink-3);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.check-foot button{font-family:var(--mono);font-size:10.5px;background:none;border:1px solid var(--rule);color:var(--ink-2);padding:3px 10px;border-radius:3px;cursor:pointer;letter-spacing:.05em}
+.check-foot button:hover{border-color:var(--blueprint);color:var(--blueprint)}
+
+/* refs */
+.refs{margin:14px 0 0;padding-left:30px;list-style:decimal;max-width:none}
+.refs li{display:list-item;padding:6px 0 6px 4px;border-bottom:1px solid var(--rule-2);margin:0;font-family:var(--cond);font-size:13.5px;line-height:1.4}
+.refs li::marker{font-family:var(--mono);font-size:11px;color:var(--signal);font-weight:600}
+.refs li a{overflow-wrap:anywhere;font-family:var(--mono);font-size:11px;display:inline-block;margin-top:2px;color:var(--ink-3);text-decoration:none}
+.refs li a:hover{color:var(--blueprint);text-decoration:underline}
+.refs .rt{color:var(--ink);font-weight:500}
+
+.colophon{margin-top:70px;padding-top:22px;border-top:3px solid var(--blueprint);font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.75}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);margin:36px 0 0;display:block;font-weight:600}
+
+
+
+/* ================= motor de slides ================= */
+html{scroll-snap-type:y proximity;scroll-behavior:smooth}
+body{margin:0}
+.slide{height:100vh;min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:flex-start;padding:26px clamp(64px,6vw,96px) 26px;font-size:15.5px;overflow:hidden;position:relative;border-bottom:1px solid var(--rule-2);background:var(--paper)}
+.slide.alt{background:var(--surface-2)}
+.slide .inner{max-width:none;width:100%;margin:0;max-height:calc(100vh - 52px);overflow:auto;scrollbar-width:thin}
+.slide.fit .inner{overflow:visible}
+.slide h2{max-width:none;font-size:clamp(24px,3.2vw,38px);margin-top:6px}
+.slide .lead{font-size:clamp(15.5px,1.35vw,18px);color:var(--ink-2);max-width:none;margin:10px 0 0;line-height:1.5}
+.slide p,.slide ul,.slide ol,.slide .rule-box,.slide .trap,.slide .case,.slide .note,.slide .more,.slide figcaption,.slide .check,.slide .refs,.slide h2{max-width:none}
+.two{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(16px,2.4vw,34px);align-items:start;margin-top:16px}
+@media (max-width:900px){.two{grid-template-columns:1fr}}
+.two figure,.two .tw,.two .code,.two .term{margin-top:0}
+.kicker-part{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--signal);font-weight:600}
+.kicker-part span{color:var(--ink-3);font-weight:400;margin-left:10px}
+.more{margin-top:16px;max-width:76ch;border:1px solid var(--rule);border-radius:4px;background:var(--surface)}
+.more summary{cursor:pointer;font-family:var(--cond);font-weight:600;font-size:14px;padding:10px 14px;color:var(--blueprint);list-style:none;display:flex;align-items:center;gap:8px}
+.more summary::before{content:"+";font-family:var(--mono);width:16px;display:inline-block;text-align:center}
+.more[open] summary::before{content:"–"}
+.more>div{padding:0 16px 14px;font-size:15.5px}
+.more>div p,.more>div li{max-width:none;font-size:15.5px}
+.more .tw{margin-top:10px}
+.bul{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:9px}
+.bul li{position:relative;padding-left:24px;font-size:15.5px;line-height:1.5;margin:0}
+.bul li::before{content:"";position:absolute;left:4px;top:9px;width:10px;height:10px;border-radius:2px;background:var(--blueprint)}
+.bul li.warn::before{background:var(--signal)}
+.bul li.stop::before{background:var(--stop)}
+.bul li.go::before{background:var(--go)}
+
+/* capa */
+.slide.cover{justify-content:center;background:var(--paper)}
+.slide.divider{justify-content:center}
+.brand{font-family:var(--cond);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;color:var(--blueprint);display:inline-flex;align-items:center;gap:10px}
+.brand::before{content:"";width:22px;height:2px;background:var(--signal)}
+.cover h1{font-family:var(--cond);font-weight:700;font-size:clamp(42px,7.2vw,88px);line-height:.98;letter-spacing:-.02em;margin:22px 0 0;text-wrap:balance;max-width:none}
+.cover .lede{font-size:clamp(18px,1.9vw,23px);color:var(--ink-2);max-width:none;margin:22px 0 0;line-height:1.55}
+.cover-meta{margin-top:34px;display:flex;flex-wrap:wrap;gap:24px 40px;font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.cover-meta b{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px;font-weight:600}
+.cover-meta span{font-family:var(--cond);font-size:15px;color:var(--ink);letter-spacing:0}
+.hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.hint::after{content:"↓";animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+
+/* separador de parte */
+.slide.divider{justify-content:center;background:var(--blueprint);color:#F1F4F7;border-bottom:0}
+.slide.divider .kicker-part{color:#F4B07A}
+.slide.divider .kicker-part span{color:rgba(241,244,247,.6)}
+.slide.divider h2{color:#FFFFFF;font-size:clamp(40px,6vw,74px);max-width:none}
+.slide.divider p{color:rgba(241,244,247,.82);font-size:clamp(17px,1.7vw,21px);max-width:none}
+.slide.divider .num{font-family:var(--mono);font-size:clamp(90px,16vw,200px);font-weight:600;color:rgba(255,255,255,.08);position:absolute;right:4vw;bottom:-2vw;line-height:1;letter-spacing:-.04em;pointer-events:none}
+
+/* barra fixa, progresso, navegação */
+.topbar{position:fixed;top:0;left:0;right:0;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,3vw,28px);background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);z-index:40}
+.topbar .brand{font-size:12px}
+.topbar .where{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;display:flex;align-items:center;gap:12px}
+.topbar .where b{color:var(--ink);font-weight:600}
+.prog{position:fixed;top:0;left:0;height:3px;background:var(--signal);width:0;z-index:41;transition:width .25s ease}
+.navbtn{position:fixed;left:clamp(8px,1.2vw,18px);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px;z-index:40;align-items:center;opacity:.28;transition:opacity .25s ease}
+.navbtn:hover,.navbtn:focus-within{opacity:1}
+@media (hover:none){.navbtn{opacity:.85}}
+.navbtn .cnt{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.04em;margin-top:2px}
+.navbtn .cnt b{color:var(--ink)}
+.navbtn button,.menubtn{font-family:var(--mono);font-size:13px;width:42px;height:42px;border-radius:4px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer;box-shadow:var(--shadow);display:inline-flex;align-items:center;justify-content:center}
+.navbtn button:hover,.menubtn:hover{border-color:var(--blueprint);color:var(--blueprint)}
+.menubtn{font-size:16px}
+.menu{position:fixed;inset:0 auto 0 0;width:min(360px,92vw);background:var(--surface);border-right:1px solid var(--rule);box-shadow:var(--shadow);z-index:45;overflow-y:auto;padding:14px 10px 40px;transform:translateX(-102%);transition:transform .28s ease}
+.menu.open{transform:none}
+.menu .grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);padding:14px 10px 4px;border-top:1px solid var(--rule-2);margin-top:6px}
+.menu .grp:first-child{border-top:0;margin-top:0}
+.menu a{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--ink-2);font-family:var(--cond);font-size:14px;padding:6px 10px;border-radius:3px;border-left:2px solid transparent}
+.menu a .n{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);min-width:20px;font-variant-numeric:tabular-nums}
+.menu a:hover{background:var(--blueprint-soft);color:var(--ink)}
+.menu a.on{border-left-color:var(--blueprint);color:var(--blueprint);background:var(--blueprint-soft);font-weight:600}
+.scrim{position:fixed;inset:0;background:rgba(16,23,32,.25);z-index:44;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+
+/* efeitos de entrada — estado de repouso legível; só deslocamento e leve fade */
+.rv{transform:translateY(16px);opacity:.55;transition:transform .55s cubic-bezier(.2,.7,.2,1),opacity .55s ease}
+.slide.in .rv{transform:none;opacity:1}
+.slide.in .rv:nth-child(2){transition-delay:.06s}.slide.in .rv:nth-child(3){transition-delay:.12s}.slide.in .rv:nth-child(4){transition-delay:.18s}.slide.in .rv:nth-child(5){transition-delay:.24s}.slide.in .rv:nth-child(6){transition-delay:.30s}
+.slide.cover .rv{transform:none;opacity:1}
+@media (prefers-reduced-motion:reduce){.rv{transform:none;opacity:1;transition:none}.hint::after{animation:none}.prog{transition:none}.menu{transition:none}}
+
+/* figuras leves */
+.shot{border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.shot img{display:block;width:100%;height:auto}
+.sets{position:relative;height:250px;max-width:520px;margin:0 auto;font-family:var(--cond)}
+.sets div{position:absolute;border-radius:50%;border:1.5px solid var(--rule);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;font-size:13px;color:var(--ink-2);text-align:center;line-height:1.3}
+.sets .s1{inset:0;background:var(--surface-2)}
+.sets .s2{inset:12% 15% 8% 15%;background:var(--amber-soft);border-color:var(--amber)}
+.sets .s3{inset:38% 32% 14% 32%;background:var(--signal-soft);border-color:var(--signal);align-items:center;padding:0;font-weight:600;color:var(--signal)}
+.dec{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:20px}
+.dec div{border:1px solid var(--rule);border-radius:4px;padding:12px 14px;background:var(--surface)}
+.dec b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;margin-bottom:6px}
+.dec .h{border-left:3px solid var(--stop)}.dec .h b{color:var(--stop)}
+.dec .p{border-left:3px solid var(--amber)}.dec .p b{color:var(--amber)}
+.dec .m{border-left:3px solid var(--go)}.dec .m b{color:var(--go)}
+.dec ul{margin:0;padding-left:16px;max-width:none}
+.dec li{font-family:var(--cond);font-size:14px;line-height:1.4;margin:4px 0}
+
+/* impressão: um slide por página */
+@page{size:A4 landscape;margin:12mm}
+@media print{
+  html{scroll-snap-type:none}
+  body{background:#fff;color:#101720}
+  .prog,.navbtn,.menubtn,.menu,.scrim,.hint{display:none!important}
+  .slide{min-height:0;height:auto;break-after:page;padding:8mm 4mm;border:0;justify-content:flex-start;overflow:visible}
+  .slide .inner{max-height:none;overflow:visible;zoom:1!important}
+  .slide.divider{background:#17436B!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rv{transform:none;opacity:1}
+  .more{display:block}.more>div{display:block}
+  .term{background:#0B1219!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rule-box,.trap,.case,.note,.pill,.bar-fill,.bar-track,.node,.dec div,.sets div{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .code pre,.term pre{white-space:pre-wrap;word-break:break-word}
+  a{color:inherit;text-decoration:none}
+}
+
+/* limites de altura: um slide por tela */
+.slide .tw{max-height:none;overflow:auto}
+.slide .tw table{font-size:13.5px}
+.slide .tw td,.slide .tw th{padding:8px 11px}
+.slide figure{margin-top:14px}
+.slide .shot img{max-height:34vh;width:auto;max-width:100%;margin:0 auto}
+.slide .code pre,.slide .term pre{max-height:none;overflow:auto;font-size:12px}
+.slide .rule-box,.slide .trap,.slide .case,.slide .note{margin-top:14px;padding:12px 16px}
+.slide .rule-box p,.slide .trap p,.slide .case p,.slide .note p{font-size:14.5px}
+.slide ol,.slide ul{margin-top:10px}
+.slide li{margin:5px 0;font-size:15px}
+.slide h4{margin-top:14px}
+.slide .check{max-height:none}
+.slide .refs{max-height:none}
+.slide .refs li{font-size:13px;padding:6px 0 6px 4px}
+.slide figcaption{font-size:12.5px;margin-top:8px}
+.slide .dec ul{padding-left:14px}.slide .dec li{font-size:13.5px}
+.slide .frame{padding:16px}
+.slide .sets{height:210px}
+@media (max-height:760px){.slide .shot img{max-height:30vh}}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.three figure{margin:0}
+.three .shot img{max-height:none}
+@media (max-width:900px){.three{grid-template-columns:1fr}}
+.slide .node{padding:9px 11px;gap:4px}.slide .node .nt{font-size:14px}.slide .node .nd{font-size:12px}
+
+/* ================= celular e tablet ================= */
+@media (max-width:900px){
+  html{scroll-snap-type:none}
+  .slide{height:auto;min-height:0;overflow:visible;padding:26px 16px 30px;scroll-snap-align:none;font-size:15px}
+  .slide .inner{max-height:none;overflow:visible;zoom:1!important}
+  .slide.cover,.slide.divider{min-height:72vh;padding:40px 18px}
+  .cover h1{font-size:clamp(38px,11vw,60px)}
+  .cover .lede{font-size:17px}
+  .cover-meta{gap:14px 24px}
+  .hint{display:none}
+  .slide h2{font-size:clamp(23px,6.4vw,30px)}
+  .slide .lead{font-size:15.5px}
+  .kicker-part span{display:block;margin-left:0;margin-top:2px}
+  .two,.three{grid-template-columns:minmax(0,1fr);gap:14px}
+  .slide{max-width:100vw;overflow-x:hidden}
+  .slide .inner{min-width:0}
+  .two>*,.three>*{min-width:0}
+  .slide .tw{max-height:none}
+  .slide .tw table{min-width:560px;font-size:13px}
+  .slide .shot img{max-height:none}
+  .slide .code pre,.slide .term pre{max-height:none;font-size:11.5px}
+  .slide .refs,.slide .check{max-height:none}
+  .compare{grid-template-columns:minmax(0,1fr)}.compare>div:first-child{border-right:0;border-bottom:1px solid var(--rule)}
+  .dec{grid-template-columns:minmax(0,1fr)}
+  .flow{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  .sets{height:200px}
+  .navbtn{left:auto;right:10px;top:auto;bottom:10px;transform:none;flex-direction:row;gap:6px;padding:6px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow)}
+  .navbtn button,.menubtn{width:38px;height:38px;box-shadow:none}
+  .navbtn .cnt{margin:0 4px 0 2px}
+  .menu{width:100vw;inset:0 0 0 0}
+  .slide.divider .num{font-size:24vw;right:2vw;bottom:-3vw}
+  .rule-box,.trap,.case,.note{padding:12px 14px}
+}
+@media (max-width:480px){
+  .slide{padding:22px 12px 26px}
+  .plate div,.cover-meta div{width:100%}
+  .bar-row{grid-template-columns:minmax(64px,90px) minmax(0,1fr) 46px;gap:6px}
+  .ui-body{grid-template-columns:1fr}.ui-side{border-right:0;border-bottom:1px solid var(--rule)}
+}
+.gl4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:14px}
+.gl{column-count:1}
+.gl{margin:0;font-family:var(--cond);font-size:12.5px;line-height:1.38;columns:2;column-gap:18px}
+.gl dt{break-inside:avoid}.gl dd{break-inside:avoid}
+@media (max-width:640px){.gl{columns:1}}
+.gl dt{font-weight:600;color:var(--blueprint);margin-top:7px}
+.gl dd{margin:1px 0 0;color:var(--ink-2)}
+
+@media (max-width:640px){.gl4{grid-template-columns:minmax(0,1fr)}}
+.menu-head{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 10px;border-bottom:1px solid var(--rule);margin-bottom:6px}
+.menu-head button{font-family:var(--mono);font-size:20px;line-height:1;width:34px;height:34px;border:1px solid var(--rule);border-radius:4px;background:var(--surface);color:var(--ink-2);cursor:pointer}
+.menu-head button:hover{border-color:var(--blueprint);color:var(--blueprint)}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:4vh 4vw;background:rgba(16,23,32,.45)}
+.modal.on{display:flex}
+.modal-box{background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow);max-width:1100px;width:100%;max-height:92vh;display:flex;flex-direction:column}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule);font-family:var(--cond);font-weight:600;font-size:15px;color:var(--blueprint)}
+.modal-head button{font-family:var(--mono);font-size:20px;line-height:1;width:34px;height:34px;border:1px solid var(--rule);border-radius:4px;background:var(--surface);color:var(--ink-2);cursor:pointer}
+.modal-body{padding:14px 18px 20px;overflow:auto;font-size:15px}
+.modal-body p,.modal-body li{max-width:none;font-size:15px}
+.modal-body .tw{margin-top:10px}.modal-body .two{margin-top:8px}
+.modal-body .shot img{max-height:60vh;width:auto;max-width:100%}
+/* 4) botão de copiar */
+.code,.term{position:relative}
+.copy{position:absolute;top:6px;right:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;padding:3px 8px;border-radius:3px;border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;opacity:.75;z-index:2}
+.copy:hover{opacity:1;border-color:var(--blueprint);color:var(--blueprint)}
+.term .copy{background:#141F2B;border-color:#2B3B4C;color:#9FB1C2}
+.copy.ok{color:var(--go);border-color:var(--go)}
+.gterm{text-decoration:underline dotted var(--blueprint-2);text-decoration-thickness:1.5px;text-underline-offset:3px;cursor:help}
+.gterm:hover,.gterm:focus{background:var(--blueprint-soft);outline:none;border-radius:2px}
+.gpop{position:fixed;z-index:70;max-width:340px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-left:3px solid var(--blueprint);border-radius:4px;box-shadow:var(--shadow);padding:10px 12px;font-family:var(--cond);font-size:13.5px;line-height:1.45;display:none;pointer-events:none}
+.gpop.on{display:block}
+.gpop b{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--blueprint);margin-bottom:4px}
+@media (hover:none){.gpop{pointer-events:auto}}
+.slide .check{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.slide .check .check-foot{grid-column:1/-1}
+.slide .check-item{border-right:1px solid var(--rule-2)}.slide .check-item:nth-child(even){border-right:0}
+.slide .refs{columns:2;column-gap:28px}.slide .refs li{break-inside:avoid}
+#s06 .tw td,#s06 .tw th{padding:6px 10px}
+@media (max-width:900px){.slide .check{grid-template-columns:minmax(0,1fr)}.slide .check-item{border-right:0}.slide .refs{columns:1}}
+
+/* extras deste manual */
+.gantt{display:grid;grid-template-columns:150px repeat(12,minmax(0,1fr));gap:4px 0;font-family:var(--cond);font-size:12.5px;align-items:center}
+.gantt .gl{padding-right:8px;color:var(--ink-2);text-align:right}
+.gantt .gm{font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:center;border-bottom:1px solid var(--rule);padding-bottom:3px}
+.gantt .gb{height:14px;border-radius:2px;background:var(--blueprint);margin:3px 1px}
+.gantt .gb.s{background:var(--signal)}.gantt .gb.g{background:var(--go)}.gantt .gb.a{background:var(--amber)}
+.cycle{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.cycle .node{align-items:center;text-align:center}
+.struct{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.struct>div{border:1px solid var(--rule);border-radius:4px;background:var(--surface);padding:10px 12px}
+.struct h5{margin:0 0 6px;font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--blueprint)}
+.struct ol,.struct ul{margin:0;padding-left:16px}.struct li{font-family:var(--cond);font-size:13px;line-height:1.35;margin:2px 0}
+@media (max-width:900px){.struct{grid-template-columns:minmax(0,1fr)}.gantt{grid-template-columns:110px repeat(12,minmax(0,1fr))}}
+
+/* lupa: clique na captura para ampliar */
+.shot img{cursor:zoom-in}
+.lightbox{position:fixed;inset:0;z-index:80;background:rgba(10,14,20,.88);display:none;align-items:center;justify-content:center;padding:3vh 3vw;cursor:zoom-out}
+.lightbox.on{display:flex}
+.lightbox img{max-width:94vw;max-height:88vh;width:auto;height:auto;border-radius:4px;box-shadow:0 12px 40px rgba(0,0,0,.6);background:#fff}
+.lightbox figcaption{position:absolute;left:50%;bottom:1.6vh;transform:translateX(-50%);max-width:90vw;font-family:var(--cond);font-size:13.5px;color:#E3E9EF;text-align:center;line-height:1.4;padding:6px 12px;background:rgba(10,14,20,.6);border-radius:4px}
+.lightbox .lb-close{position:absolute;top:12px;right:14px;width:40px;height:40px;border-radius:4px;border:1px solid rgba(255,255,255,.3);background:rgba(10,14,20,.5);color:#fff;font:20px/1 var(--mono);cursor:pointer}
+.lightbox .lb-hint{position:absolute;top:18px;left:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+@media print{.lightbox{display:none!important}}
+</style>
+<div class="prog" id="prog"></div>
+<div class="scrim" id="scrim"></div>
+<div class="gpop" id="gpop" role="tooltip"></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="modal-box"><div class="modal-head"><span id="modal-title">detalhes</span><button type="button" id="modal-close" aria-label="Fechar">×</button></div><div class="modal-body" id="modal-body"></div></div></div>
+<nav class="menu" id="menu" aria-label="Sumário"><div class="menu-head"><span class="brand">MirandasTech</span><button type="button" id="menuclose" aria-label="Fechar sumário">×</button></div><div id="menulist"></div></nav>
+<div class="navbtn"><button class="menubtn" id="menubtn" aria-label="Abrir sumário">☰</button><button id="prev" aria-label="Slide anterior">↑</button><button id="next" aria-label="Próximo slide">↓</button><span class="cnt"><b id="cur">1</b>/<span id="tot">–</span></span></div>
+
+
+<main id="deck">
+<!-- ===================== CAPA ===================== -->
+<section class="slide cover" id="s00" data-title="Capa">
+  <div class="inner">
+    <span class="brand rv">MirandasTech · Manual profissional</span>
+    <h1 class="rv">Bibliometria com VOSviewer e Bibliometrix</h1>
+    <p class="lede rv">Mapear o campo da sua revisão: os indicadores do corpus, as redes de coautoria, de termos, de fontes e de acoplamento bibliográfico, e o mapa aberto de verdade no VOSviewer Online — <strong>com um corpus real de 236 documentos do OpenAlex, scripts rodados de verdade, ferramentas gratuitas e cada fato datado</strong>.</p>
+    <div class="cover-meta rv">
+      <div><b>Série</b><span>Manuais MirandasTech · pesquisa científica</span></div>
+      <div><b>Versão</b><span>1.0 · setembro de 2026</span></div>
+      <div><b>Formato</b><span><span id="nslides">–</span> slides</span></div>
+      <div><b>Licença</b><span>CC BY 4.0 — cite a fonte</span></div>
+    </div>
+  </div>
+  <div class="hint">role para começar</div>
+</section>
+
+<section class="slide" id="s01" data-title="Para quem é e o que você vai aprender">
+  <div class="inner">
+    <div class="kicker-part rv">Como usar<span>cada slide é um passo que você executa no terminal ou no navegador</span></div>
+    <h2 class="rv">Para quem é — e o que você vai saber fazer ao final</h2>
+    <p class="lead rv">Este manual é para <strong>pós-graduandos que já fizeram a busca da própria revisão e querem mapear o campo</strong>: quem publica, com quem, onde, sobre o quê e quais documentos compartilham referências. Não exige programação: cada comando está pronto para copiar, e a saída ao lado é a saída real de 09/09/2026 sobre um <span class="gterm" tabindex="0" data-t="Corpus" data-d="O conjunto de documentos que a busca registrada devolveu; aqui, 236 registros do OpenAlex em 09/09/2026.">corpus</span> aberto de 236 documentos exportado do OpenAlex. Os mapas foram abertos de verdade no <span class="gterm" tabindex="0" data-t="VOSviewer Online" data-d="A versão web do VOSviewer (app.vosviewer.com), sem login; abre JSON ou map/network e exporta captura.">VOSviewer Online</span> (que não exige conta); o VOSviewer desktop e o <span class="gterm" tabindex="0" data-t="Bibliometrix · biblioshiny" data-d="Pacote R (5.5.0, GPL-3) para bibliometria e sua interface web «sem código».">Bibliometrix</span> não foram executados e são descritos pela documentação oficial — o manual diz isso sempre que acontece.</p>
+    <div class="two rv">
+      <div>
+        <h4>Ao final, você vai conseguir</h4>
+        <ul class="bul">
+          <li><strong>Explicar</strong> o que a <span class="gterm" tabindex="0" data-t="Bibliometria" data-d="Medir a produção científica a partir do que foi publicado: documentos, autores, fontes, citações e as redes entre eles; aqui, descrição de um campo, não avaliação de pessoas.">bibliometria</span> mede e o que não mede: <span class="gterm" tabindex="0" data-t="Item" data-d="Objeto de interesse do mapa: um autor, um termo, uma fonte ou um documento (manual do VOSviewer, cap. 2).">item</span>, <span class="gterm" tabindex="0" data-t="Link" data-d="Relação entre dois itens; há no máximo um link por par.">link</span>, força, <span class="gterm" tabindex="0" data-t="Cluster" data-d="Conjunto de itens que o VOSviewer agrupa; cada item pertence a um só cluster, numerado 1, 2, …">cluster</span>, os cinco tipos de <span class="gterm" tabindex="0" data-t="Rede" data-d="Itens + links; o que o map file e o network file (ou o JSON) descrevem.">rede</span> — e por que o <span class="gterm" tabindex="0" data-t="Manifesto de Leiden" data-d="Dez princípios para o uso de indicadores na avaliação da pesquisa (Hicks et al., Nature, 2015).">Manifesto de Leiden</span> e a <span class="gterm" tabindex="0" data-t="DORA" data-d="San Francisco Declaration on Research Assessment (2012): não usar métricas de periódico para avaliar artigos ou pesquisadores.">DORA</span> proíbem usar isso para julgar pessoas.</li>
+          <li><strong>Exportar</strong> o <span class="gterm" tabindex="0" data-t="Corpus" data-d="O conjunto de documentos que a busca registrada devolveu; aqui, 236 registros do OpenAlex em 09/09/2026.">corpus</span> da base certa, no formato que o VOSviewer lê, respeitando os limites de cada base e sem somar bases diferentes.</li>
+          <li><strong>Calcular</strong> os indicadores do corpus com <code>indicadores_bibliometricos.py</code>: produção por ano, fontes, autores, citações pelo Crossref e <span class="gterm" tabindex="0" data-t="Índice h do corpus" data-d="O maior h tal que h documentos do corpus têm pelo menos h citações; descreve o conjunto, não uma pessoa.">índice h do corpus</span>.</li>
+          <li><strong>Construir</strong> as redes com <code>mapa_vosviewer.py</code> ou com o wizard «Create Map» do VOSviewer, e <strong>abrir</strong> no <span class="gterm" tabindex="0" data-t="VOSviewer Online" data-d="A versão web do VOSviewer (app.vosviewer.com), sem login; abre JSON ou map/network e exporta captura.">VOSviewer Online</span>: itens, cores, links, <span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">overlay</span> por ano médio.</li>
+          <li><strong>Instalar</strong> o <span class="gterm" tabindex="0" data-t="Bibliometrix · biblioshiny" data-d="Pacote R (5.5.0, GPL-3) para bibliometria e sua interface web «sem código».">Bibliometrix</span> 5.5.0 e abrir o <span class="gterm" tabindex="0" data-t="Bibliometrix · biblioshiny" data-d="Pacote R (5.5.0, GPL-3) para bibliometria e sua interface web «sem código».">biblioshiny</span> em R, como alternativa sem código.</li>
+          <li><strong>Relatar</strong> a seção de método bibliométrico com tudo o que um leitor precisa para reproduzir o mapa — e ler os clusters sem inventar temas.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Nomes de painéis, botões e opções são os do manual oficial do VOSviewer (versão 1.6.20, de 31/10/2023) e das páginas públicas observadas em 09/09/2026; quando a sua tela divergir, vale a tela. Todo número deste manual tem um arquivo de origem: o CSV do corpus, o JSON do Crossref ou a saída do script que aparece na figura.</p></div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>Usar o mapa para dizer quem é «o melhor».</strong> Um autor com 3 documentos num corpus de 236 não «lidera» nada; um <span class="gterm" tabindex="0" data-t="Cluster" data-d="Conjunto de itens que o VOSviewer agrupa; cada item pertence a um só cluster, numerado 1, 2, …">cluster</span> de termos não é um «tema consolidado»; o <span class="gterm" tabindex="0" data-t="Fator de impacto" data-d="Métrica de periódico (média de citações por artigo num período); a DORA pede que não seja usada como medida de qualidade de artigos ou pessoas.">fator de impacto</span> de um periódico não diz a qualidade de um artigo. A Parte 1 começa por aí, antes de qualquer mapa.</p></div>
+        <div class="note"><span class="blabel">Manuais irmãos</span><p>Este manual cuida do <em>mapa do campo</em>. Os passos vizinhos estão nos manuais de <a href="https://busca.mirandastech.com.br/">Busca</a> (de onde vem o corpus, com string e data registradas), <a href="https://prisma.mirandastech.com.br/">PRISMA</a> (a triagem), <a href="https://zotero.mirandastech.com.br/">Zotero</a> (as referências), <a href="https://dados.mirandastech.com.br/">Dados</a> (o CSV e o JSON), <a href="https://git.mirandastech.com.br/">Git</a> (versionar os arquivos do mapa), <a href="https://latex.mirandastech.com.br/">LaTeX</a> (a figura no texto), <a href="https://manual.mirandastech.com.br/">Uso de IA</a> (declarar) e <a href="https://plugin.mirandastech.com.br/">Plugin</a> (o agente que roda os scripts). Hub: <a href="https://www.mirandastech.com.br/pesquisa">mirandastech.com.br/pesquisa</a>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s02" data-title="Mapa: da busca ao mapa relatado">
+  <div class="inner">
+    <div class="kicker-part rv">Introdução<span>o roteiro do manual segue a ordem de uma análise bibliométrica</span></div>
+    <h2 class="rv">Mapa: da busca registrada ao mapa relatado — e onde cada parte do manual entra</h2>
+    <div class="flow rv">
+      <div class="node"><span class="nn">1</span><span class="nt">Busca registrada</span><span class="nd">String, base, data e n no diário (manual de Busca); aqui: 236 registros do OpenAlex, 09/09/2026</span></div>
+      <div class="node"><span class="nn">2</span><span class="nt">Exportar da base</span><span class="nd">Web of Science, Scopus, Dimensions, Lens, PubMed ou API (OpenAlex, Crossref) no formato que o VOSviewer lê</span></div>
+      <div class="node"><span class="nn">3</span><span class="nt">Indicadores</span><span class="nd"><code>indicadores_bibliometricos.py</code>: produção por ano, fontes, autores, citações, <span class="gterm" tabindex="0" data-t="Índice h do corpus" data-d="O maior h tal que h documentos do corpus têm pelo menos h citações; descreve o conjunto, não uma pessoa.">índice h do corpus</span></span></div>
+      <div class="node"><span class="nn">4</span><span class="nt">Redes</span><span class="nd"><code>mapa_vosviewer.py</code> ou o wizard «Create Map»: <span class="gterm" tabindex="0" data-t="Coautoria" data-d="Rede em que dois autores (organizações, países) se ligam quando assinam o mesmo documento.">coautoria</span>, termos, fontes, acoplamento; <span class="gterm" tabindex="0" data-t="Limiar" data-d="O mínimo de documentos (ou de ocorrências) para um item entrar no mapa; parâmetro do método.">limiar</span> declarado</span></div>
+      <div class="node"><span class="nn">5</span><span class="nt">Abrir o mapa</span><span class="nd">VOSviewer (Java) ou VOSviewer Online (navegador, sem login): itens, links, clusters, <span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">overlay</span></span></div>
+      <div class="node"><span class="nn">6</span><span class="nt">Ler os clusters</span><span class="nd">Com os documentos de cada cluster na mão; rótulo provisório, nunca «tema» sem leitura</span></div>
+      <div class="node gate"><span class="nn">7</span><span class="nt">Relatar</span><span class="nd">Base, string, data, n, software e versão, tipo de <span class="gterm" tabindex="0" data-t="Link" data-d="Relação entre dois itens; há no máximo um link por par.">link</span>, contagem, limiares, itens/links/clusters — na seção de método</span></div>
+    </div>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:190px">Parte</th><th>O que cobre</th><th style="width:110px">Passos</th></tr></thead><tbody>
+        <tr><td><b>1 O que mede e o que não mede</b></td><td>Leiden e <span class="gterm" tabindex="0" data-t="DORA" data-d="San Francisco Declaration on Research Assessment (2012): não usar métricas de periódico para avaliar artigos ou pesquisadores.">DORA</span> · os cinco tipos de <span class="gterm" tabindex="0" data-t="Rede" data-d="Itens + links; o que o map file e o network file (ou o JSON) descrevem.">rede</span> · <span class="gterm" tabindex="0" data-t="Contagem completa" data-d="Cada coautoria, coocorrência ou referência em comum vale 1 (full counting).">contagem completa</span> × fracionada · o corpus vem da busca registrada</td><td>Passo 1</td></tr>
+        <tr><td><b>2 Bases e exportações</b></td><td>Web of Science, Scopus, Dimensions, Lens, PubMed, OpenAlex (e o orçamento da API), Crossref · limites · SCImago e a DORA · o que exportar</td><td>Passo 2</td></tr>
+        <tr><td><b>3 Indicadores com script</b></td><td><code>indicadores_bibliometricos.py</code> · produção por ano · fontes e autores · citações pelo Crossref e índice h</td><td>Passo 3</td></tr>
+        <tr><td><b>4 VOSviewer</b></td><td>O que é · o aviso de segurança · a interface · «Create Map» · <span class="gterm" tabindex="0" data-t="Thesaurus" data-d="Arquivo do VOSviewer que une variantes de um mesmo item («h-index» / «Hirsch index») e permite ignorar termos genéricos.">thesaurus</span> · arquivos map/<span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">network</span>/JSON · <code>mapa_vosviewer.py</code></td><td>Passos 4 e 5</td></tr>
+        <tr><td><b>5 VOSviewer Online</b></td><td>Abrir · termos · painel View · overlay · <span class="gterm" tabindex="0" data-t="Coautoria" data-d="Rede em que dois autores (organizações, países) se ligam quando assinam o mesmo documento.">coautoria</span> · fontes · salvar e compartilhar · docs</td><td>Passo 5</td></tr>
+        <tr><td><b>6 Bibliometrix e outros</b></td><td>bibliometrix 5.5.0 e <span class="gterm" tabindex="0" data-t="Bibliometrix · biblioshiny" data-d="Pacote R (5.5.0, GPL-3) para bibliometria e sua interface web «sem código».">biblioshiny</span> · CiteSpace · como citar as ferramentas</td><td>Passos 3 a 5</td></tr>
+        <tr><td><b>7 Relatar e fechar</b></td><td>A seção de método · ler clusters · plugin · erros comuns · checklist · glossário · referências</td><td>Passos 6 e 7</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="rule-box"><span class="blabel">Como ler</span><p>Quem nunca fez <span class="gterm" tabindex="0" data-t="Bibliometria" data-d="Medir a produção científica a partir do que foi publicado: documentos, autores, fontes, citações e as redes entre eles; aqui, descrição de um campo, não avaliação de pessoas.">bibliometria</span> começa na Parte 1 e não pula a Parte 2: o mapa só é tão bom quanto a exportação. Quem já tem o CSV da busca vai à Parte 3 com o terminal aberto. Quem já tem os arquivos do VOSviewer e só quer ver o mapa vai à Parte 5. Ninguém pula a Parte 7: é ela que torna o mapa reprodutível.</p></div>
+        <div class="note"><span class="blabel">Convenções</span><p>Nomes de painel, botão e opção entre «aspas angulares», em inglês como aparecem no VOSviewer. Comandos em blocos com botão «copiar». Capturas de páginas em 1920 × 938, feitas em 09/09/2026 sem login. Figuras de terminal e do VOSviewer Online com «execução real»: corpus de 236 documentos do OpenAlex. Nenhuma senha, chave ou token aparece neste manual nem nos scripts — o Crossref só pede um <code>mailto</code>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PARTE 1 ===================== -->
+<section class="slide divider" id="s03" data-title="Parte 1 · O que a bibliometria mede e o que não mede"><div class="inner"><div class="kicker-part rv">Parte 1<span>O que a bibliometria mede e o que não mede</span></div><h2 class="rv">Indicadores × avaliação: Leiden e DORA; os cinco tipos de rede; contagem completa × fracionada; o corpus vem da busca registrada</h2><p class="rv">Antes do primeiro mapa: o que um indicador descreve e o que ele não julga, o vocabulário do VOSviewer (<span class="gterm" tabindex="0" data-t="Item" data-d="Objeto de interesse do mapa: um autor, um termo, uma fonte ou um documento (manual do VOSviewer, cap. 2).">item</span>, link, força, cluster), os cinco tipos de rede e as duas maneiras de contar — e de onde os 236 documentos da demonstração vieram.</p></div><div class="num">01</div></section>
+
+<section class="slide" id="s04" data-title="Indicadores × avaliação: o Manifesto de Leiden">
+  <div class="inner">
+    <div class="kicker-part rv">O que mede e o que não mede<span>1 de 5 · leidenmanifesto.org · Hicks et al., Nature, 2015 · captura de 09/09/2026</span></div>
+    <h2 class="rv">Indicadores descrevem um campo; não avaliam pessoas — os dez princípios do Manifesto de Leiden</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_18_leiden_manifesto.jpg" width="1920" height="938" alt="Página inicial do Leiden Manifesto for Research Metrics: 10 principles to guide research evaluation, with 25 translations, a video and a blog; Hicks, Wouters, Waltman, de Rijcke, Rafols, Nature, April 23, 2015"></div><figcaption><b>Figura 1</b> leidenmanifesto.org (captura de 09/09/2026): «10 principles to guide research evaluation», 25 traduções, vídeo. Publicado como comentário na <em>Nature</em> em 23/04/2015 por Hicks, Wouters, Waltman, de Rijcke e Rafols (DOI 10.1038/520429a). A avaliação da pesquisa «é cada vez mais guiada por dados e não pelo julgamento de especialistas» — o manifesto existe para corrigir isso.</figcaption></figure>
+      <div class="tw"><table><thead><tr><th style="width:36px">#</th><th>Princípio (Manifesto de Leiden, 2015)</th><th style="width:230px">O que muda no seu mapa</th></tr></thead><tbody>
+        <tr><td class="num">1</td><td>A avaliação quantitativa deve apoiar a avaliação qualitativa por especialistas</td><td>O mapa ilustra a revisão; não a substitui</td></tr>
+        <tr><td class="num">2</td><td>Medir o desempenho em relação às missões de pesquisa da instituição, grupo ou pesquisador</td><td>Nenhum indicador vale fora do contexto</td></tr>
+        <tr><td class="num">3</td><td>Proteger a excelência da pesquisa localmente relevante</td><td>Produção em português não é «menor»</td></tr>
+        <tr><td class="num">4</td><td>Manter a coleta de dados e os processos analíticos abertos, transparentes e simples</td><td>Scripts abertos, base e string declaradas</td></tr>
+        <tr><td class="num">5</td><td>Permitir que os avaliados verifiquem dados e análises</td><td>CSV e JSON guardados com o texto</td></tr>
+        <tr><td class="num">6</td><td>Considerar a variação por área nas práticas de publicação e <span class="gterm" tabindex="0" data-t="Citação (rede de)" data-d="Rede em que um documento (fonte, autor…) se liga ao que cita, dentro do corpus.">citação</span></td><td>Não comparar contagens entre áreas</td></tr>
+        <tr><td class="num">7</td><td>Basear a avaliação de pesquisadores individuais no julgamento qualitativo do seu portfólio</td><td>Sem ranking de pessoas (slide seguinte)</td></tr>
+        <tr><td class="num">8</td><td>Evitar concretude equivocada e falsa precisão</td><td>«Índice h 17» é do corpus, com data e fonte</td></tr>
+        <tr><td class="num">9</td><td>Reconhecer os efeitos sistêmicos da avaliação e dos indicadores</td><td>O que se mede muda o que se faz</td></tr>
+        <tr><td class="num">10</td><td>Examinar os indicadores regularmente e atualizá-los</td><td>Rode de novo antes da defesa; a base mudou</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="rule-box rv"><span class="blabel">Regra</span><p>Bibliometria, neste manual, é <em>descrição do campo</em>: quantos documentos, em que anos, em quais fontes, com quais termos e quem colabora com quem. Toda vez que um número parecer dizer «quem é melhor», volte a esta tabela — é o princípio 7 sendo violado. Os títulos dos princípios foram conferidos na página do manifesto e na Wikipédia em inglês em 09/09/2026.</p></div>
+  </div>
+</section>
+
+<section class="slide alt" id="s05" data-title="DORA: o fator de impacto não mede o artigo">
+  <div class="inner">
+    <div class="kicker-part rv">O que mede e o que não mede<span>2 de 5 · sfdora.org · captura de 09/09/2026</span></div>
+    <h2 class="rv">DORA: o fator de impacto de um periódico não é medida da qualidade de um artigo nem de quem o escreveu</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_19_dora.jpg" width="1920" height="938" alt="Página The Declaration do site da DORA: San Francisco Declaration on Research Assessment, com o texto sobre a necessidade de melhorar a avaliação da pesquisa e a lista de traduções"></div><figcaption><b>Figura 2</b> sfdora.org, «The Declaration» (captura de 09/09/2026): a San Francisco Declaration on Research Assessment nasceu em 2012, na reunião anual da American Society for Cell Biology; o texto lembra que o fator de impacto foi criado para ajudar bibliotecas a escolher assinaturas, não para medir a qualidade científica de um artigo.</figcaption></figure>
+      <div>
+        <div class="compare">
+          <div><div class="cmp-h">O que a DORA pede</div><ul>
+            <li>Não usar métricas baseadas em periódicos, como o <span class="gterm" tabindex="0" data-t="Fator de impacto" data-d="Métrica de periódico (média de citações por artigo num período); a DORA pede que não seja usada como medida de qualidade de artigos ou pessoas.">fator de impacto</span>, como medida substituta da qualidade de artigos individuais</li>
+            <li>Não usá-las para avaliar as contribuições de um cientista, nem em decisões de contratação, promoção ou financiamento</li>
+            <li>Aos pesquisadores: avaliar pelo conteúdo; citar a literatura primária; usar várias métricas e indicadores ao apresentar o próprio impacto; desafiar práticas que dependem indevidamente do fator de impacto</li>
+          </ul></div>
+          <div><div class="cmp-h">O que este manual faz com isso</div><ul>
+            <li>A tabela «fontes mais frequentes» diz <em>onde</em> o campo publica, não onde é «melhor» publicar</li>
+            <li>O <span class="gterm" tabindex="0" data-t="SJR" data-d="SCImago Journal Rank: indicador de periódico do SCImago; descreve a revista, não o artigo.">SJR</span> do SCImago (Parte 2) aparece como <em>descrição</em> de um periódico, com data, e nunca como nota de um artigo</li>
+            <li>Os «mais citados» do corpus vêm do Crossref, com fonte e data; <span class="gterm" tabindex="0" data-t="Citação (rede de)" data-d="Rede em que um documento (fonte, autor…) se liga ao que cita, dentro do corpus.">citação</span> mede atenção, não qualidade</li>
+            <li>Nenhum slide ordena pessoas; o script avisa que os nomes vêm «sem <span class="gterm" tabindex="0" data-t="Desambiguação" data-d="Decidir se «Silva, J.» e «Silva, João» são a mesma pessoa; sem ela, um autor vira dois círculos.">desambiguação</span>»</li>
+          </ul></div>
+        </div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>«Vou publicar onde o fator de impacto é maior».</strong> Escolher periódico pelo escopo, pela política de <span class="gterm" tabindex="0" data-t="Acesso aberto" data-d="Documento cujo texto completo está disponível sem assinatura; no CSV do OpenAlex, a coluna is_oa.">acesso aberto</span> e pela avaliação do seu programa é decisão sua e do seu orientador; usar o fator de impacto como atalho é exatamente o que a DORA recomenda desafiar. O plugin (Parte 7) recusa esse pedido e explica por quê.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s06" data-title="Os cinco tipos de rede">
+  <div class="inner">
+    <div class="kicker-part rv">O que mede e o que não mede<span>3 de 5 · manual do VOSviewer 1.6.20, cap. 2 e seção 3.5.4</span></div>
+    <h2 class="rv">Os cinco tipos de rede: o que liga dois itens, qual é a unidade, o que a rede mede e quando usar cada uma</h2>
+    <p class="lead rv">No vocabulário do manual do VOSviewer (cap. 2), um mapa é uma <strong>rede</strong> de <strong>itens</strong> (os objetos de interesse) ligados por <strong>links</strong> (no máximo um por par de itens), cada um com uma <strong>força</strong> (um valor positivo: quantos documentos os dois coautoraram, em quantos os dois termos coocorrem, quantas referências têm em comum). O VOSviewer agrupa os itens em <strong>clusters</strong> (cada item em um só, numerados 1, 2, …). O que muda de um mapa para outro é <em>o que conta como link</em>.</p>
+    <div class="tw rv"><table><thead><tr><th style="width:190px">Tipo de link</th><th style="width:260px">Unidade (item)</th><th>O que a rede mede</th><th style="width:300px">Quando usar na sua revisão</th><th style="width:150px">No corpus real</th></tr></thead><tbody>
+      <tr><td><b>Coautoria</b></td><td>Autores, organizações ou países</td><td>Quem assina documentos com quem; a força é o nº de documentos em comum</td><td>Para descrever a colaboração do campo: grupos, países, se a colaboração é densa ou esparsa</td><td>60 autores, 101 links, 25 clusters (Parte 5)</td></tr>
+      <tr><td><b><span class="gterm" tabindex="0" data-t="Coocorrência" data-d="Rede em que dois termos ou palavras-chave se ligam quando aparecem no mesmo documento.">Coocorrência</span></b></td><td>Palavras-chave (da base) ou termos (de títulos e resumos, só em inglês)</td><td>Quais termos aparecem juntos nos mesmos documentos; a força é o nº de documentos em que coocorrem</td><td>Para ver do que o campo fala e como os assuntos se agrupam — o mapa que mais aparece em revisões</td><td>80 termos, 3.154 links, 2 clusters</td></tr>
+      <tr><td><b>Citação</b></td><td>Documentos, fontes, autores, organizações ou países</td><td>Quem cita quem <em>dentro</em> do corpus</td><td>Para achar os documentos-ponte; exige dados de citação da base (não vem de RIS/EndNote)</td><td>não construída neste manual (o <code>mapa_vosviewer.py</code> gera coautoria, termos, fontes e acoplamento)</td></tr>
+      <tr><td><b><span class="gterm" tabindex="0" data-t="Acoplamento bibliográfico" data-d="Dois documentos se ligam quando citam as mesmas referências; a força é o nº de referências em comum.">Acoplamento bibliográfico</span></b></td><td>Documentos, fontes, autores, organizações ou países</td><td>Dois documentos se ligam quando <em>citam as mesmas referências</em>; a força é o nº de referências em comum</td><td>Para agrupar documentos recentes (que ainda não foram citados) por base intelectual comum</td><td>90 documentos, 138 links, 35 isolados</td></tr>
+      <tr><td><b><span class="gterm" tabindex="0" data-t="Cocitação" data-d="Duas referências se ligam quando são citadas juntas pelo mesmo documento.">Cocitação</span></b></td><td>Referências, fontes ou autores <em>citados</em></td><td>Duas referências se ligam quando são <em>citadas juntas</em> pelo mesmo documento</td><td>Para ver a base clássica do campo: os trabalhos que todo mundo cita em conjunto</td><td>não construída neste manual; disponível no wizard do VOSviewer a partir de arquivos das bases</td></tr>
+    </tbody></table></div>
+    <div class="two rv">
+      <div class="rule-box"><span class="blabel">Regra</span><p>Escolha o tipo de rede pela <em>pergunta</em>, não pelo desenho: «quem colabora?» é coautoria; «do que se fala?» é <span class="gterm" tabindex="0" data-t="Coocorrência" data-d="Rede em que dois termos ou palavras-chave se ligam quando aparecem no mesmo documento.">coocorrência</span>; «quais documentos partilham base?» é acoplamento; «quais clássicos são citados juntos?» é <span class="gterm" tabindex="0" data-t="Cocitação" data-d="Duas referências se ligam quando são citadas juntas pelo mesmo documento.">cocitação</span>. Cada mapa declara o tipo de link e a unidade na legenda (Parte 7).</p></div>
+      <div class="note"><span class="blabel">Pesos e scores</span><p>Além dos links, cada item tem <em>pesos</em> (<span class="gterm" tabindex="0" data-t="Peso (weight)" data-d="Atributo numérico do item que dá o tamanho do círculo: «Links», «Total link strength», «Documents», «Citations», «Occurrences».">weight</span>: por padrão «Links» e «<span class="gterm" tabindex="0" data-t="Força total (Total link strength)" data-d="A soma das forças dos links de um item — ou de toda a rede, na barra de status.">Total link strength</span>»; «Documents», «Citations» e «Occurrences» como pesos customizados) e pode ter <em>scores</em> para a visualização overlay («Pub. year», «Avg. pub. year», «Citations», «Avg. citations», «Norm. citations»…). Tamanho do círculo = <span class="gterm" tabindex="0" data-t="Peso (weight)" data-d="Atributo numérico do item que dá o tamanho do círculo: «Links», «Total link strength», «Documents», «Citations», «Occurrences».">peso</span>; cor no overlay = <span class="gterm" tabindex="0" data-t="Score" data-d="Atributo numérico do item que dá a cor no overlay: «Pub. year», «Avg. pub. year», «Citations», «Avg. citations», «Norm. citations».">score</span>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s07" data-title="Contagem completa × fracionada">
+  <div class="inner">
+    <div class="kicker-part rv">O que mede e o que não mede<span>4 de 5 · manual do VOSviewer 1.6.20, seção 3.5.4 · exemplo ilustrativo</span></div>
+    <h2 class="rv">Contagem completa × fracionada: na completa cada coautoria vale 1; na fracionada vale 1/<em>n</em> para os <em>n</em> coautores</h2>
+    <div class="two rv">
+      <div>
+        <p class="lead">O wizard «Create Map» pergunta o <strong>counting method</strong>. Na <span class="gterm" tabindex="0" data-t="Contagem completa" data-d="Cada coautoria, coocorrência ou referência em comum vale 1 (full counting).">contagem completa</span> (<em>full counting</em>) cada coautoria, coocorrência ou referência em comum vale 1. Na fracionada (<em>fractional counting</em>), o link vale 1/<em>n</em> para cada um dos <em>n</em> coautores — o que reduz o <span class="gterm" tabindex="0" data-t="Peso (weight)" data-d="Atributo numérico do item que dá o tamanho do círculo: «Links», «Total link strength», «Documents», «Citations», «Occurrences».">peso</span> dos documentos com muitos autores. O exemplo ao lado é <strong>ilustrativo</strong>: um único documento assinado por quatro autores, A1 a A4.</p>
+        <div class="compare">
+          <div><div class="cmp-h">Completa (full counting)</div><ul>
+            <li>Um documento com A1, A2, A3 e A4 gera seis links: A1–A2, A1–A3, A1–A4, A2–A3, A2–A4, A3–A4</li>
+            <li>Cada link vale <strong>1</strong></li>
+            <li>Um documento com 30 autores gera centenas de links de força 1: é ele quem «desenha» o mapa</li>
+          </ul></div>
+          <div><div class="cmp-h">Fracionada (fractional counting)</div><ul>
+            <li>Os mesmos seis links</li>
+            <li>Cada link vale <strong>1/4</strong> (1/<em>n</em>, com <em>n</em> = 4 coautores)</li>
+            <li>O documento com 30 autores pesa o mesmo que o documento com dois: a contagem corrige a hiperautoria</li>
+          </ul></div>
+        </div>
+      </div>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:190px">Situação</th><th>Contagem indicada</th></tr></thead><tbody>
+          <tr><td><b>Coautoria em área com poucos autores por documento</b></td><td>Completa — é a que os scripts deste manual usam (média de 3,1 autores por documento no corpus real)</td></tr>
+          <tr><td><b>Coautoria com documentos de dezenas de autores</b></td><td>Fracionada — senão um único consórcio domina o mapa</td></tr>
+          <tr><td><b>Coocorrência de termos</b></td><td>Completa costuma bastar; declare</td></tr>
+          <tr><td><b>Comparar dois mapas</b></td><td>A mesma contagem nos dois; contagens diferentes não se comparam</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>A contagem é um parâmetro do método e entra na seção de método (Parte 7): «contagem completa» ou «<span class="gterm" tabindex="0" data-t="Contagem fracionada" data-d="Cada link vale 1/n para os n coautores (fractional counting); reduz o peso de documentos com muitos autores.">contagem fracionada</span>», nunca subentendida. Os números de links e de <span class="gterm" tabindex="0" data-t="Força total (Total link strength)" data-d="A soma das forças dos links de um item — ou de toda a rede, na barra de status.">força total</span> mudam com ela — os da demonstração (coautoria: 101 links, <span class="gterm" tabindex="0" data-t="Força total (Total link strength)" data-d="A soma das forças dos links de um item — ou de toda a rede, na barra de status.">força total</span> 202) são de contagem completa.</p></div>
+        <div class="note"><span class="blabel">Termos também têm limiares</span><p>Para mapas de termos o manual usa outros dois filtros: o mínimo de ocorrências (padrão 10) e a relevância (por padrão exclui os 40 % de termos menos relevantes). Ambos são parâmetros a declarar (Parte 4).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s08" data-title="O corpus vem da busca registrada">
+  <div class="inner">
+    <div class="kicker-part rv">O que mede e o que não mede<span>5 de 5 · manual de Busca desta série · buscar_openalex.py · diário JSON de 09/09/2026</span></div>
+    <h2 class="rv">O corpus vem da busca registrada: string, base, data, período, tipos e <em>n</em> — sem isso, o mapa não se reproduz</h2>
+    <div class="two rv">
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:190px">Do diário da busca</th><th>O corpus da demonstração (real)</th></tr></thead><tbody>
+          <tr><td><b>Base e ferramenta</b></td><td>OpenAlex, pela API, com o <code>buscar_openalex.py</code> do <a href="https://busca.mirandastech.com.br/">manual de Busca</a></td></tr>
+          <tr><td><b>String</b></td><td class="mono">"predictive maintenance" AND (port OR terminal OR crane) — em título e resumo</td></tr>
+          <tr><td><b>Período e tipos</b></td><td>2015–2026; article | book-chapter | preprint</td></tr>
+          <tr><td><b>Data</b></td><td>09/09/2026 (diário JSON datado)</td></tr>
+          <tr><td><b><em>n</em></b></td><td>235 na contagem da API; <strong>236 registros gravados</strong> no CSV; 226 com <span class="gterm" tabindex="0" data-t="DOI" data-d="Digital Object Identifier: o identificador que o Crossref usa para devolver citações e referências.">DOI</span>; 207 com resumo</td></tr>
+          <tr><td><b>Colunas do CSV</b></td><td class="mono">title, abstract, year, <span class="gterm" tabindex="0" data-t="DOI" data-d="Digital Object Identifier: o identificador que o Crossref usa para devolver citações e referências.">doi</span>, authors, source, is_oa, type, openalex_id</td></tr>
+        </tbody></table></div>
+        <div class="code"><div class="code-head">os arquivos que a Parte 3 e a Parte 4 vão usar — guardados junto com o texto</div><pre>corpus.csv            # a exportação da busca (236 linhas + cabeçalho)
+crossref_refs.json    # citações e referências pelo Crossref (Parte 3)
+coautoria_map.txt  coautoria_network.txt  coautoria.json   # as redes (Parte 4)
+termos_map.txt     termos_network.txt     termos.json
+acoplamento_map.txt acoplamento_network.txt acoplamento.json</pre></div>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>O mapa herda as regras da busca: string e data registradas (PRISMA-S, o <code>BUSCA.md</code> do manual de Busca), <strong>nunca somar bases sem deduplicar com critério</strong> — e o VOSviewer nem permite combinar arquivos de bases diferentes — e <strong>nenhum número no texto sem arquivo de origem</strong>. «235 na API e 236 gravados» é o tipo de detalhe que vai para o diário, não para o esquecimento.</p></div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>Corpus pequeno e recente.</strong> 236 documentos, 111 deles de 2026 (ano corrente, parcial): as redes vão ser esparsas (coautoria com 13 isolados) e os clusters de termos, poucos (2). Isso é uma <em>característica do campo naquela data</em>, e o manual vai mostrá-la como tal — não uma falha a esconder com limiares baixos.</p></div>
+        <div class="note"><span class="blabel">Por que OpenAlex</span><p>Porque é aberto: o corpus pode ser publicado com o texto (manual de Dados), e o leitor pode refazer a busca. Exportações da Web of Science e do Scopus são licenciadas — ficam fora do repositório (manual de Git) e o texto relata só a string e os agregados.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===================== PARTE 2 ===================== -->
+<section class="slide divider" id="s09" data-title="Parte 2 · Bases e exportações"><div class="inner"><div class="kicker-part rv">Parte 2<span>Bases e exportações</span></div><h2 class="rv">De onde vêm os dados: Web of Science, Scopus, Dimensions, Lens, PubMed, OpenAlex e Crossref; os limites de exportação; SCImago e a DORA; o que exportar em cada base</h2><p class="rv">O VOSviewer lê arquivos de cinco bases e consulta sete APIs. As páginas públicas aparecem em capturas de 09/09/2026, sem login; o que exige assinatura (Web of Science, Scopus) é descrito pelo manual do VOSviewer, com os nomes exatos das opções de exportação. Preços e tamanhos de acervo não foram conferidos e não aparecem.</p></div><div class="num">02</div></section>
+
+<section class="slide" id="s10" data-title="Web of Science e Scopus">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>1 de 6 · webofscience.com · scopus.com · manual do VOSviewer 1.6.20 · captura de 09/09/2026</span></div>
+    <h2 class="rv">Web of Science e Scopus: as duas bases por assinatura — exportação por lotes (500 e 2.000 documentos) e dados de citação completos</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_12_wos_home.jpg" width="1920" height="938" alt="Tela de login da Web of Science, da Clarivate: Sign in to continue with Web of Science, com os campos de e-mail e senha e o login institucional"></div><figcaption><b>Figura 3</b> webofscience.com (captura de 09/09/2026): a tela «Sign in to continue with Web of Science», com «Faça login», «Registre-se» e «Login Institucional». A base é por assinatura; o manual não fez login e descreve a exportação pelo manual do VOSviewer. O Scopus (scopus.com) bloqueou o navegador automatizado pela verificação da Cloudflare e não foi capturado.</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:130px">Base</th><th>Exportação que o VOSviewer pede (manual 1.6.20)</th><th style="width:170px">Limite por vez</th></tr></thead><tbody>
+          <tr><td><b>Web of Science</b> (Clarivate)</td><td>«Full Record and Cited References», em arquivo <em>tab-delimited</em> — é o que traz as referências citadas, necessárias para citação, acoplamento e cocitação</td><td><b>500</b> documentos</td></tr>
+          <tr><td><b>Scopus</b> (Elsevier)</td><td>«CSV export» com <em>todos os campos</em> marcados — sem eles o arquivo perde resumos, palavras-chave ou referências</td><td><b>2.000</b> documentos</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Corpus maior que o limite: exporte em lotes (por ano, por exemplo) e abra todos os arquivos juntos no VOSviewer — arquivos <em>da mesma base</em> podem ser combinados, e os documentos duplicados são removidos automaticamente. <strong>Bases diferentes não se combinam</strong>: um mapa é de uma base só.</p></div>
+        <div class="note"><span class="blabel">Licença</span><p>A exportação completa de uma base paga é material licenciado: fica fora do repositório público (manual de Git). No texto e no repositório vão a string, a data, o <em>n</em>, os agregados e a figura do mapa.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s11" data-title="Dimensions e Lens">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>2 de 6 · dimensions.ai · lens.org · manual do VOSviewer 1.6.20 · capturas de 09/09/2026</span></div>
+    <h2 class="rv">Dimensions e Lens: uma versão gratuita com conta e uma base aberta sem conta — com «Export for bibliometric mapping» e «Export» CSV</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_13_dimensions.jpg" width="1920" height="938" alt="Página inicial do Dimensions, da Digital Science: Intelligent discovery. Faster insight., com os botões Login e Talk to us"></div><figcaption><b>Figura 4</b> dimensions.ai (captura de 09/09/2026): «Intelligent discovery. Faster insight.», da Digital Science. Segundo o manual do VOSviewer, a versão gratuita (com conta) exporta até <b>2.500</b> documentos por vez, com a opção «Export for bibliometric mapping».</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_14_lens.jpg" width="1920" height="938" alt="Página inicial do Lens.org: Explore global science and technology knowledge, com a busca de patentes e scholarly works e o aviso de cookies"></div><figcaption><b>Figura 5</b> lens.org (captura de 09/09/2026): «serve conhecimento científico e de patentes integrado como bem público»; «todos podem acessar e usar o site sem conta e sem custo». Exportação «Export» em CSV; limite citado pelo manual do VOSviewer: <b>50.000</b> documentos.</figcaption></figure>
+    </div>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:130px">Base</th><th>Acesso</th><th>Exportação para o VOSviewer</th><th style="width:130px">Limite por vez</th></tr></thead><tbody>
+        <tr><td><b>Dimensions</b> (Digital Science)</td><td>Versão gratuita com conta (manual do VOSviewer)</td><td>«Export for bibliometric mapping»</td><td>2.500</td></tr>
+        <tr><td><b>Lens</b> (Cambia)</td><td>Sem conta e sem custo, segundo a própria página</td><td>«Export» em CSV</td><td>50.000</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Para uma revisão que precisa ser reproduzível por qualquer leitor, prefira uma base que ele também possa consultar: Lens e OpenAlex são abertas; Dimensions tem a versão gratuita; Web of Science e Scopus dependem da assinatura da instituição. Registre no diário qual foi e por quê.</p></div>
+        <div class="note"><span class="blabel">Sem números de acervo</span><p>A página do Dimensions exibe contagens de registros; a do Lens, versões. Nenhum desses números foi conferido para este manual e nenhum entra aqui — o que vale é o que a sua busca devolveu na sua data.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s12" data-title="PubMed e Crossref">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>3 de 6 · pubmed.ncbi.nlm.nih.gov · api.crossref.org · manual do VOSviewer 1.6.20 · captura de 09/09/2026</span></div>
+    <h2 class="rv">PubMed e Crossref: a base aberta da área da saúde («Save», sem dados de citação) e a API gratuita que conta citações por DOI</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_23_pubmed.jpg" width="1920" height="938" alt="Resultados do PubMed para a busca bibliometric analysis predictive maintenance, com 15 resultados, os botões Save, Email e Send to e os filtros por ano e texto"></div><figcaption><b>Figura 6</b> PubMed (captura de 09/09/2026), busca «bibliometric analysis predictive maintenance»: os botões «Save», «Email» e «Send to» acima dos resultados. Para o VOSviewer, «Save» no formato PubMed; limite citado pelo manual: <b>10.000</b> documentos por vez. O arquivo <em>não</em> traz dados de citação — serve para coautoria e coocorrência, não para citação, acoplamento ou cocitação.</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:150px">Crossref (api.crossref.org)</th><th>O que é e o que devolve</th></tr></thead><tbody>
+          <tr><td><b>Acesso</b></td><td>Gratuito, sem chave; um <code>mailto</code> na requisição coloca você no <span class="gterm" tabindex="0" data-t="Polite pool" data-d="Fila «educada» da API do Crossref: quem se identifica com mailto recebe serviço mais estável.">polite pool</span></td></tr>
+          <tr><td><b>Por DOI</b></td><td><code>api.crossref.org/works/&lt;DOI&gt;</code> devolve, entre outros campos, <code>is-referenced-by-count</code> (quantas vezes o documento foi citado no Crossref) e a lista <code>reference</code> (as referências do documento — nem sempre com DOI)</td></tr>
+          <tr><td><b>No corpus real</b></td><td>226 DOIs consultados, 196 respondidos (195 com contagem), 91 com referências que têm DOI — é esse subconjunto que alimenta o <span class="gterm" tabindex="0" data-t="Acoplamento bibliográfico" data-d="Dois documentos se ligam quando citam as mesmas referências; a força é o nº de referências em comum.">acoplamento bibliográfico</span> (Parte 4)</td></tr>
+          <tr><td><b>No VOSviewer</b></td><td>Uma das sete APIs do wizard «Create Map» (com OpenAlex, Europe PMC, Semantic Scholar, OCC, COCI e Wikidata)</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Citação pelo Crossref conta só o que o Crossref indexa — menos do que Scopus ou Web of Science contariam. Todo número de citação no texto diz a fonte e a data: «1.131 citações somadas (Crossref, 09/09/2026)». Não compare contagens de fontes diferentes.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s13" data-title="OpenAlex e o orçamento da API">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>4 de 6 · help.openalex.org · api.openalex.org · capturas de 09/09/2026</span></div>
+    <h2 class="rv">OpenAlex: a base aberta de onde veio o corpus — e o aviso de 09/09/2026: a API agora tem um orçamento diário que se esgota</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_10_openalex_help.jpg" width="1920" height="938" alt="OpenAlex Help Center: Get help with OpenAlex, a comprehensive index of the world's research; seções Search, Learn, Reference e Chat"></div><figcaption><b>Figura 7</b> help.openalex.org (captura de 09/09/2026): o Help Center com «Search», «Learn» (Quickstart, How-to guides, Tutorials) e «Reference». O manual de Busca desta série exporta o corpus daqui com o <code>buscar_openalex.py</code>.</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_24_openalex_docs_api.jpg" width="1920" height="938" alt="OpenAlex Help Center, com a barra lateral Home, Start, How-to, Tutorials, Access, Data, API e App"></div><figcaption><b>Figura 8</b> help.openalex.org (captura de 09/09/2026), a barra lateral com «Access», «Data» e «API». A página openalex.org/pricing ficou atrás da verificação da Cloudflare e não foi capturada; o que se sabe do orçamento vem da própria resposta da API, ao lado.</figcaption></figure>
+    </div>
+    <div class="two rv">
+      <div class="code"><div class="code-head">resposta real da API do OpenAlex à consulta de teste, 09/09/2026 (JSON, sem alteração)</div><pre>{"error":"Rate limit exceeded",
+ "message":"Insufficient budget. This request costs $0.001 but you only have $0.0001 remaining.
+            Resets at midnight UTC. Need more? Add funds at https://openalex.org/pricing",
+ "creditsRequired":10,"creditsRemaining":1}</pre></div>
+      <div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>A API cobra por requisição.</strong> Em 09/09/2026 cada chamada custava um valor em créditos, com um orçamento diário gratuito que se esgota e reinicia à meia-noite UTC. A exportação do corpus deste manual foi feita <em>antes</em> de o orçamento acabar. O VOSviewer também consome essa API quando baixa por URL de requisição («Create a map based on bibliographic data» → OpenAlex): planeje a exportação, guarde o JSON e não repita a busca sem necessidade.</p></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Exporte uma vez, com data, e trabalhe sobre o arquivo salvo (<code>corpus.csv</code> ou o JSON da API). O VOSviewer aceita «JSON salvo» como fonte: é o caminho que não depende do orçamento do dia. Valores da tabela de preços não aparecem aqui porque não foram conferidos.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s14" data-title="Limites e o que exportar em cada base">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>5 de 6 · manual do VOSviewer 1.6.20, seção 3.5.4 · gerenciadores de referências</span></div>
+    <h2 class="rv">Resumo: os limites de exportação e a opção exata de cada base — e o que um arquivo RIS ou EndNote não consegue fazer</h2>
+    <div class="tw rv"><table><thead><tr><th style="width:170px">Fonte</th><th style="width:250px">Opção de exportação (nome no manual)</th><th style="width:150px">Limite por vez</th><th>Redes possíveis</th><th style="width:230px">Observação</th></tr></thead><tbody>
+      <tr><td><b>Web of Science</b></td><td>«Full Record and Cited References», <em>tab-delimited</em></td><td class="num">500</td><td>Coautoria, coocorrência, citação, acoplamento, cocitação</td><td>Assinatura; combine lotes da mesma base</td></tr>
+      <tr><td><b>Scopus</b></td><td>«CSV export», todos os campos</td><td class="num">2.000</td><td>Todas</td><td>Assinatura</td></tr>
+      <tr><td><b>Dimensions</b></td><td>«Export for bibliometric mapping»</td><td class="num">2.500</td><td>Coautoria, coocorrência; as de citação conforme os campos do arquivo</td><td>Versão gratuita com conta</td></tr>
+      <tr><td><b>Lens</b></td><td>«Export», CSV</td><td class="num">50.000</td><td>Coautoria, coocorrência; as de citação conforme os campos do arquivo</td><td>Sem conta e sem custo</td></tr>
+      <tr><td><b>PubMed</b></td><td>«Save», formato PubMed</td><td class="num">10.000</td><td>Coautoria, coocorrência (sem dados de citação)</td><td>Aberta</td></tr>
+      <tr><td><b>APIs</b> (OpenAlex, Crossref, Europe PMC, Semantic Scholar, OCC, COCI, Wikidata)</td><td>Por URL de requisição, por busca, por lista de DOIs ou por JSON salvo</td><td>—</td><td>Conforme a API</td><td>OpenAlex: orçamento diário (slide anterior)</td></tr>
+      <tr><td><b>RIS, EndNote, RefWorks</b></td><td>Arquivo do gerenciador de referências</td><td>—</td><td>Coautoria e coocorrência apenas</td><td><strong>Sem</strong> citação, acoplamento ou cocitação</td></tr>
+      <tr><td><b>Arquivos do VOSviewer</b></td><td>map/<span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">network</span>, JSON, GML, Pajek</td><td>—</td><td>A rede já pronta (Parte 4)</td><td>É o que <code>mapa_vosviewer.py</code> grava</td></tr>
+    </tbody></table></div>
+    <div class="two rv">
+      <div class="rule-box"><span class="blabel">Regra</span><p>Antes de exportar, decida a rede: se a pergunta é de citação, acoplamento ou cocitação, o arquivo precisa das referências citadas — «Full Record and Cited References» na Web of Science, «CSV export» com todos os campos no Scopus; um RIS do Zotero ou o «Save» do PubMed não servem. Se a pergunta é de coautoria ou de termos, qualquer fonte da tabela basta. Anote no diário a opção usada, com o nome exato.</p></div>
+      <div class="note"><span class="blabel">Duplicados</span><p>Ao abrir vários arquivos da mesma base, o VOSviewer remove documentos duplicados automaticamente. Entre bases diferentes ele não combina — e nem deveria: a deduplicação entre bases é trabalho da triagem (manual de PRISMA), com critério registrado.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s15" data-title="SCImago (SJR) e a DORA">
+  <div class="inner">
+    <div class="kicker-part rv">Bases e exportações<span>6 de 6 · scimagojr.com · sfdora.org · captura de 09/09/2026</span></div>
+    <h2 class="rv">SCImago e o SJR: um indicador <em>de periódico</em> para descrever onde o campo publica — não para dar nota a um artigo</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_15_scimago.jpg" width="1920" height="938" alt="Página inicial do SCImago Journal and Country Rank, com a busca por título de periódico, ISSN ou editora, os menus Journal Rankings e Country Rankings e a seção What is SJR for"></div><figcaption><b>Figura 9</b> scimagojr.com (captura de 09/09/2026): «SCImago Journal &amp; Country Rank», com «Journal Rankings», «Country Rankings» e a busca por título, ISSN ou editora; logo abaixo, «What is SJR for?». O SJR é um indicador de periódico.</figcaption></figure>
+      <div>
+        <div class="compare">
+          <div><div class="cmp-h">Uso descritivo (aceitável)</div><ul>
+            <li>«As 5 fontes mais frequentes do corpus são Zenodo (21), SSRN (9), arXiv (7), <em>Sensors</em> (5) e <em>Sustainability</em> (4)» — três delas são repositórios, não periódicos (Parte 3)</li>
+            <li>Consultar o <span class="gterm" tabindex="0" data-t="SJR" data-d="SCImago Journal Rank: indicador de periódico do SCImago; descreve a revista, não o artigo.">SJR</span> de <em>Sensors</em> e <em>Sustainability</em> para caracterizar os periódicos em que o campo publica, com a data da consulta</li>
+            <li>Escolher onde submeter pelo escopo, pela política de <span class="gterm" tabindex="0" data-t="Acesso aberto" data-d="Documento cujo texto completo está disponível sem assinatura; no CSV do OpenAlex, a coluna is_oa.">acesso aberto</span> e pela avaliação do programa — o SJR é um dado entre vários</li>
+          </ul></div>
+          <div><div class="cmp-h">Uso avaliativo (o que a DORA proíbe)</div><ul>
+            <li>Dizer que um artigo é bom porque saiu num periódico de SJR alto</li>
+            <li>Ordenar os documentos do corpus pelo SJR da fonte</li>
+            <li>Usar o fator de impacto ou o SJR para avaliar a contribuição de um pesquisador, ou em contratação, promoção e financiamento</li>
+          </ul></div>
+        </div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Métrica de periódico descreve o periódico. Se a sua revisão citar o SJR, cite como cita qualquer dado: com fonte (scimagojr.com), data e a ressalva da DORA. O plugin (Parte 7) recusa «usa o fator de impacto para escolher onde publicar» e sugere escopo e política de acesso aberto.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===================== PARTE 3 ===================== -->
+<section class="slide divider" id="s16" data-title="Parte 3 · Indicadores do corpus com script"><div class="inner"><div class="kicker-part rv">Parte 3<span>Indicadores do corpus com script</span></div><h2 class="rv"><code>indicadores_bibliometricos.py</code>; produção por ano e a armadilha do ano corrente; fontes e autores; citações pelo Crossref e índice h do corpus</h2><p class="rv">Quatro slides com o terminal aberto: um script em Python, só biblioteca padrão (e uma figura opcional), lê o <code>corpus.csv</code> de 236 documentos e imprime os indicadores em Markdown, prontos para a seção de resultados. A saída que aparece é a saída real de 09/09/2026 — com as duas lições que o corpus ensinou: repositórios contados como «fonte» e uma organização contada como «autor».</p></div><div class="num">03</div></section>
+
+<section class="slide" id="s17" data-title="indicadores_bibliometricos.py">
+  <div class="inner">
+    <div class="kicker-part rv">Indicadores com script<span>1 de 4 · execução real de 09/09/2026 · Python 3 · corpus de 236 documentos do OpenAlex</span></div>
+    <h2 class="rv"><code>indicadores_bibliometricos.py</code>: total, período, autores, tipos, acesso aberto, produção por ano, fontes, autores, citações e índice h — em Markdown</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_t1_indicadores.jpg" width="1920" height="1452" alt="Terminal: python3 scripts/indicadores_bibliometricos.py corpus.csv --citacoes crossref_refs.json --top 5 --figura producao_por_ano.png --markdown indicadores.md, com a saída em Markdown: 236 documentos, 2015–2026, 671 autores, tipos, acesso aberto, produção por ano, fontes, autores, citações e índice h 17"></div><figcaption><b>Figura 10</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): <code>indicadores_bibliometricos.py corpus.csv --citacoes crossref_refs.json --top 5 --figura producao_por_ano.png --markdown indicadores.md</code>. A saída é Markdown: «Documentos: 236; período: 2015–2026; autores distintos: 671; média de autores por documento: 3,1»; «Tipos: article 193, preprint 27, book-chapter 16»; «Acesso aberto (is_oa=true): 182 de 236 (77 %)»; as tabelas de produção por ano, fontes, autores e citações; «figura: producao_por_ano.png»; «gravado: indicadores.md».</figcaption></figure>
+      <div>
+        <div class="code"><div class="code-head">terminal — uso (o CSV é o da busca; o JSON do Crossref é opcional e vem do slide «Citações»)</div><pre>python3 scripts/indicadores_bibliometricos.py corpus.csv                 # só o CSV: tudo menos citações
+python3 scripts/indicadores_bibliometricos.py corpus.csv \
+    --citacoes crossref_refs.json \      # citações e índice h do corpus
+    --top 5 \                            # tamanho das tabelas (padrão 10)
+    --figura producao_por_ano.png \      # gráfico de barras por ano
+    --markdown indicadores.md            # grava a saída em Markdown</pre></div>
+        <div class="tw"><table><thead><tr><th style="width:170px">Indicador</th><th>Corpus real (09/09/2026)</th></tr></thead><tbody>
+          <tr><td><b>Documentos · período</b></td><td>236 · 2015–2026</td></tr>
+          <tr><td><b>Autores</b></td><td>671 distintos; 3,1 por documento</td></tr>
+          <tr><td><b>Tipos</b></td><td>article 193 · preprint 27 · book-chapter 16</td></tr>
+          <tr><td><b>Acesso aberto</b></td><td>182 de 236 (77 %), pela coluna <code>is_oa</code></td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>O script só lê o CSV e o JSON; não consulta a internet e não altera nada. A saída em Markdown vai para o diário e, depois de lida com calma, para a seção de resultados — cada número com o nome do arquivo e a data. O <code>--top</code> controla o tamanho das tabelas; use 10 para a análise e 5 para a figura do artigo.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s18" data-title="Produção por ano e o ano corrente parcial">
+  <div class="inner">
+    <div class="kicker-part rv">Indicadores com script<span>2 de 4 · figura gerada pelo script em 09/09/2026 · corpus de 236 documentos do OpenAlex</span></div>
+    <h2 class="rv">Produção por ano: de 1 documento em 2015 a 111 em 2026 — e a armadilha de ler o ano corrente, parcial, como alta ou queda</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_fig_producao_por_ano.png" width="1050" height="540" alt="Gráfico de barras Produção por ano (n = 236): de 2015 a 2026, com crescimento acentuado em 2024, 2025 e 2026"></div><figcaption><b>Figura 11</b> <code>producao_por_ano.png</code>, gerada pelo <code>indicadores_bibliometricos.py</code> (execução real; corpus de 236 documentos do OpenAlex, 09/09/2026): «Produção por ano (n = 236)». A barra de 2026 é o ano corrente, <em>parcial</em> — a busca foi feita em setembro.</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th>Ano</th><th class="num">Docs</th><th>Ano</th><th class="num">Docs</th><th>Ano</th><th class="num">Docs</th></tr></thead><tbody>
+          <tr><td>2015</td><td class="num">1</td><td>2019</td><td class="num">4</td><td>2023</td><td class="num">11</td></tr>
+          <tr><td>2016</td><td class="num">4</td><td>2020</td><td class="num">6</td><td>2024</td><td class="num">26</td></tr>
+          <tr><td>2017</td><td class="num">4</td><td>2021</td><td class="num">4</td><td>2025</td><td class="num">55</td></tr>
+          <tr><td>2018</td><td class="num">3</td><td>2022</td><td class="num">7</td><td>2026</td><td class="num">111 <span class="pill p-amber">parcial</span></td></tr>
+        </tbody></table></div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>O ano corrente.</strong> Os 111 documentos de 2026 foram contados em 09/09/2026: o ano não acabou, e a base ainda vai indexar o que falta. Escrever «a produção dobrou em 2026» é falsa precisão (Leiden, princípio 8); escrever «a produção caiu» quando a busca é feita em janeiro é o erro inverso. A frase certa diz a data: «até 09/09/2026, 111 documentos de 2026».</p></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Na figura do artigo, marque o ano corrente como parcial (na legenda ou com hachura) ou corte a série no último ano completo — e diga qual escolha fez. Em 2026 a base registra também preprints (27 no corpus): a série mistura tipos, e a legenda deve dizer isso.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s19" data-title="Fontes e autores: duas lições do corpus">
+  <div class="inner">
+    <div class="kicker-part rv">Indicadores com script<span>3 de 4 · saída real de 09/09/2026 (Figura 10) · corpus de 236 documentos do OpenAlex</span></div>
+    <h2 class="rv">Fontes e autores: repositórios aparecem como «fonte» e uma organização aparece como «autor» — o script mostra; você corrige e declara</h2>
+    <div class="two rv">
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:300px">Fonte (como veio da base)</th><th class="num">Docs</th><th>O que é</th></tr></thead><tbody>
+          <tr><td>Zenodo (CERN European Organization for Nuclear Research)</td><td class="num">21</td><td><span class="pill p-amber">repositório</span></td></tr>
+          <tr><td>SSRN Electronic Journal</td><td class="num">9</td><td><span class="pill p-amber">repositório de preprints</span></td></tr>
+          <tr><td>arXiv (Cornell University)</td><td class="num">7</td><td><span class="pill p-amber">repositório de preprints</span></td></tr>
+          <tr><td><em>Sensors</em></td><td class="num">5</td><td><span class="pill p-go">periódico</span></td></tr>
+          <tr><td><em>Sustainability</em></td><td class="num">4</td><td><span class="pill p-go">periódico</span></td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Lição 1 — «fonte» não é «periódico»</span><p>A coluna <code>source</code> do OpenAlex traz o lugar onde o documento está: para preprints, teses e conjuntos de dados, é um repositório. Antes de escrever «os periódicos mais produtivos», separe por <code>type</code> (article, preprint, book-chapter) — no corpus real, as três «fontes» mais frequentes são repositórios.</p></div>
+      </div>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:200px">«Autor» (sem desambiguação)</th><th class="num">Docs</th><th>O que é</th></tr></thead><tbody>
+          <tr><td>AMC Instruments</td><td class="num">3</td><td><span class="pill p-stop">organização como autor: erro da base</span></td></tr>
+          <tr><td>Prashant Mavani</td><td class="num">3</td><td>autor</td></tr>
+          <tr><td>Byunghyun Ban</td><td class="num">3</td><td>autor</td></tr>
+          <tr><td>Xavier Pillet</td><td class="num">3</td><td>autor</td></tr>
+          <tr><td>Fan Yang</td><td class="num">2</td><td>autor (nome frequente: conferir variantes)</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Lição 2 — nomes vêm «como vieram da base»</span><p>O script avisa no título da tabela: «nomes como vieram da base, sem <span class="gterm" tabindex="0" data-t="Desambiguação" data-d="Decidir se «Silva, J.» e «Silva, João» são a mesma pessoa; sem ela, um autor vira dois círculos.">desambiguação</span>». Um nome de organização registrado como autor é erro a corrigir no CSV (ou no <span class="gterm" tabindex="0" data-t="Thesaurus" data-d="Arquivo do VOSviewer que une variantes de um mesmo item («h-index» / «Hirsch index») e permite ignorar termos genéricos.">thesaurus</span>, Parte 4) antes do mapa de coautoria. E 3 documentos em 236 não fazem ninguém «líder» de nada: a tabela descreve produção, não importância.</p></div>
+        <div class="note"><span class="blabel">Fonte</span><p>Tabelas «top 5» da Figura 10; o arquivo de origem é <code>indicadores.md</code>, gravado pelo script.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s20" data-title="Citações pelo Crossref e índice h do corpus">
+  <div class="inner">
+    <div class="kicker-part rv">Indicadores com script<span>4 de 4 · api.crossref.org, polite pool, 09/09/2026 · corpus de 236 documentos do OpenAlex</span></div>
+    <h2 class="rv">Citações pelo Crossref e o índice h do corpus: 1.131 citações somadas, índice h 17, 128 documentos sem citação — o que isso é e o que não é</h2>
+    <div class="two rv">
+      <div>
+        <div class="code"><div class="code-head">enriquecimento — um laço sobre os DOIs do CSV (o script grava crossref_refs.json; não há chave nem senha)</div><pre># para cada DOI do corpus:
+#   GET https://api.crossref.org/works/&lt;DOI&gt;?mailto=seu@email   (User-Agent também com o mailto)
+#   guarda: doi, citacoes (is-referenced-by-count), refs_doi (referências com DOI), n_refs, tipo
+#   espera 0,15 s entre chamadas
+# resultado, 09/09/2026: 226 DOIs consultados → 196 respondidos (195 com contagem);
+#   91 com referências que têm DOI (é o que o acoplamento bibliográfico usa)</pre></div>
+        <div class="tw"><table><thead><tr><th class="num">Citações</th><th>Documento mais citado do corpus (Crossref, 09/09/2026)</th><th style="width:60px">Ano</th></tr></thead><tbody>
+          <tr><td class="num">119</td><td>Digital twin based condition monitoring of a knuckle boom crane</td><td>2020</td></tr>
+          <tr><td class="num">112</td><td>Designing a Shape–Performance Integrated Digital Twin…</td><td>2021</td></tr>
+          <tr><td class="num">101</td><td>Development of Digital Twin for Intelligent Maintenance of Civil Infra…</td><td>2022</td></tr>
+          <tr><td class="num">95</td><td>Predictive Maintenance of Power Substation Equipment by Infrared Thermography…</td><td>2017</td></tr>
+          <tr><td class="num">72</td><td>Navigating the Sea of Data…</td><td>2023</td></tr>
+        </tbody></table></div>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">O que é o índice h do corpus</span><p>O script define: <strong>o maior <em>h</em> tal que <em>h</em> documentos do corpus têm pelo menos <em>h</em> citações</strong>. Aqui, 17: há 17 documentos com 17 ou mais citações, e não há 18 com 18 ou mais. É uma medida do <em>conjunto</em> — «o índice h deste corpus, pelo Crossref, em 09/09/2026, é 17». Não é o índice h de nenhuma pessoa, e um índice h de pessoa não é assunto deste manual (Leiden, princípio 7).</p></div>
+        <div class="trap"><span class="blabel">Limites</span><ul>
+          <li>Conta só o que o Crossref indexa: 226 DOIs, 196 respostas; os 10 documentos sem DOI nem entram</li>
+          <li>Citação mede atenção acumulada: os mais citados são de 2017–2023; os 111 de 2026 mal tiveram tempo — 128 documentos sem citação é o esperado num corpus recente</li>
+          <li>Scopus ou Web of Science dariam outros números; nunca misture contagens de fontes diferentes numa mesma tabela</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===================== PARTE 4 ===================== -->
+<section class="slide divider" id="s21" data-title="Parte 4 · VOSviewer"><div class="inner"><div class="kicker-part rv">Parte 4<span>VOSviewer</span></div><h2 class="rv">O que é e quem faz; o aviso de segurança de 31/08; a interface; o wizard «Create Map» passo a passo; thesaurus e limpeza; os arquivos map, network e JSON; <code>mapa_vosviewer.py</code></h2><p class="rv">O VOSviewer desktop (Java) <strong>não foi executado</strong> para este manual — não havia display gráfico — e é descrito pelo manual oficial da versão 1.6.20 (31/10/2023), lido diretamente. As redes da demonstração foram construídas pelo <code>mapa_vosviewer.py</code>, nos formatos que o VOSviewer lê, e abertas no VOSviewer Online (Parte 5).</p></div><div class="num">04</div></section>
+
+<section class="slide" id="s22" data-title="O que é o VOSviewer e o aviso de segurança">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>1 de 6 · vosviewer.com · manual 1.6.20 · captura de 09/09/2026</span></div>
+    <h2 class="rv">VOSviewer: gratuito, em Java, do CWTS (Leiden) — e o aviso de 31/08/2026: baixe só do site oficial e confira o arquivo</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_01_vosviewer_home.jpg" width="1920" height="938" alt="Página inicial de vosviewer.com exibindo apenas um Security notice: em 31 de agosto uma parte não autorizada obteve acesso ao site e uma versão maliciosa do executável para Windows ficou disponível entre 3:30 e 13:20 CEST"></div><figcaption><b>Figura 12</b> vosviewer.com (captura de 09/09/2026): a página inicial exibia apenas um «Security notice». Em 31/08 «uma parte não autorizada obteve acesso ao site do VOSviewer» e «uma versão maliciosa do executável do VOSviewer para Windows ficou disponível para download em 31 de agosto entre 3:30 e 13:20 CEST»; quem baixou nesse intervalo deve apagar o arquivo e rodar o antivírus. As páginas de download e «getting started» devolviam 404 nessa data.</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:150px">VOSviewer</th><th>Manual 1.6.20 e site (09/09/2026)</th></tr></thead><tbody>
+          <tr><td><b>O que é</b></td><td>«Uma ferramenta de software para criar mapas baseados em dados de rede e para visualizar e explorar esses mapas»: redes de publicações, periódicos, pesquisadores, organizações, países, palavras-chave ou termos, ligados por coautoria, coocorrência, citação, acoplamento bibliográfico ou cocitação</td></tr>
+          <tr><td><b>Quem faz</b></td><td>Nees Jan van Eck e Ludo Waltman, CWTS, Universidade de Leiden</td></tr>
+          <tr><td><b>Custo · plataforma</b></td><td>«Pode ser usado livremente para qualquer finalidade»; desenvolvido em Java, roda na maioria das plataformas</td></tr>
+          <tr><td><b>Versão</b></td><td>Este manual segue o manual da 1.6.20 (31/10/2023); a versão mais recente <em>não</em> foi conferida, porque o site só mostrava o aviso</td></tr>
+          <tr><td><b>Citar</b></td><td>Van Eck e Waltman, <em>Scientometrics</em>, 2010 (Parte 6)</td></tr>
+        </tbody></table></div>
+        <div class="trap"><span class="blabel">Regra de segurança</span><p><strong>Baixe o VOSviewer somente de vosviewer.com</strong>, nunca de espelhos, fóruns ou links em mensagens; se baixou o executável para Windows em 31/08/2026 entre 3:30 e 13:20 CEST, apague-o e rode um antivírus completo. Enquanto o download estiver indisponível, o VOSviewer Online (Parte 5) faz a visualização sem instalar nada — e este manual mostra como.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s23" data-title="A interface: cinco painéis, três visualizações">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>2 de 6 · manual 1.6.20, cap. 3 · descrito pelo manual; o programa não foi executado</span></div>
+    <h2 class="rv">A interface: cinco painéis, as abas «File», «Items» e «Analysis», a barra de status — e as três visualizações Network, Overlay e Density</h2>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:190px">Painel (cap. 3)</th><th>Para quê</th></tr></thead><tbody>
+        <tr><td><b>Painel principal</b></td><td>O mapa em si: os itens como círculos com rótulo, os links como linhas; zoom e arrasto</td></tr>
+        <tr><td><b>Painel de opções</b></td><td>Os ajustes da visualização ativa: escala, tamanho dos rótulos, cores, linhas</td></tr>
+        <tr><td><b>Painel de informação</b></td><td>Os dados do item sob o cursor</td></tr>
+        <tr><td><b>Painel de visão geral</b></td><td>Uma miniatura do mapa inteiro, com a área visível marcada</td></tr>
+        <tr><td><b>Painel de ação</b></td><td>As abas <b>«File»</b> (abrir, criar e salvar mapas — é onde fica o «Create Map»), <b>«Items»</b> (a lista de itens do mapa) e <b>«Analysis»</b> (os parâmetros da análise que produz layout e clusters)</td></tr>
+        <tr><td><b>Barra de status</b></td><td>O número de itens, de clusters, de links e a força total — os quatro números que vão para a legenda da figura (Parte 7)</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:150px">Visualização</th><th>O que codifica</th></tr></thead><tbody>
+          <tr><td><b>Network</b></td><td>Tamanho do círculo = peso do item; cor = cluster; linhas = links (até 1.000 linhas por padrão, as mais fortes)</td></tr>
+          <tr><td><b>Overlay</b></td><td>Mesmo layout; cor = <span class="gterm" tabindex="0" data-t="Score" data-d="Atributo numérico do item que dá a cor no overlay: «Pub. year», «Avg. pub. year», «Citations», «Avg. citations», «Norm. citations».">score</span> do item (ano médio de publicação, citações…), numa barra de cores azul→verde→amarelo</td></tr>
+          <tr><td><b><span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">Density</span></b></td><td>Mapa de calor: <em>item <span class="gterm" tabindex="0" data-t="Network · Overlay · Density" data-d="As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.">density</span></em> (quanto mais itens e mais peso por perto, mais quente) e <em>cluster density</em> (a cor do cluster dominante em cada região)</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Um mapa por pergunta e uma visualização por afirmação: Network para «há grupos», Overlay para «o que é recente», Density para «onde está a massa». A figura do artigo diz qual é e traz, na legenda, itens, links, clusters e força total lidos na barra de status.</p></div>
+        <div class="note"><span class="blabel">Sem captura do desktop</span><p>Este slide não mostra a tela do VOSviewer porque o programa não foi executado para o manual; os nomes vêm do capítulo 3 do manual oficial. A Parte 5 mostra o VOSviewer Online, cuja interface é diferente (um painel lateral com «View», «Find» e «Update»).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s24" data-title="Create Map: o wizard passo a passo">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>3 de 6 · manual 1.6.20, seção 3.5.4 · «File» → «Create»</span></div>
+    <h2 class="rv">«Create Map», passo a passo: tipo de dado → fonte → tipo de link e unidade → contagem → limiares → itens</h2>
+    <div class="flow rv">
+      <div class="node"><span class="nn">1</span><span class="nt">Tipo de dado</span><span class="nd">«Create a map based on <b>network data</b>» (map/network, JSON, GML, Pajek) · «…based on <b>bibliographic data</b>» (arquivos de bases ou APIs) · «…based on <b>text data</b>» (termos de títulos e resumos, só em inglês)</span></div>
+      <div class="node"><span class="nn">2</span><span class="nt">Fonte</span><span class="nd">Arquivos: Web of Science, Scopus, Dimensions, Lens, PubMed; RIS, EndNote, RefWorks · APIs: OpenAlex, Crossref, Europe PMC, Semantic Scholar, OCC, COCI, Wikidata — por URL de requisição, por busca, por lista de DOIs ou por JSON salvo</span></div>
+      <div class="node"><span class="nn">3</span><span class="nt">Tipo de link e unidade</span><span class="nd">Coautoria: autores, organizações, países · Coocorrência: palavras-chave · Citação e acoplamento: documentos, fontes, autores, organizações, países · Cocitação: referências, fontes, autores citados</span></div>
+      <div class="node"><span class="nn">4</span><span class="nt">Contagem</span><span class="nd">Completa (cada link vale 1) ou fracionada (1/<em>n</em> para os <em>n</em> coautores) — slide «Contagem completa × fracionada»</span></div>
+      <div class="node"><span class="nn">5</span><span class="nt">Limiares</span><span class="nd">Mínimo de documentos (ou de ocorrências: padrão 10 para termos) por item; para termos, a relevância (padrão exclui 40 % dos menos relevantes)</span></div>
+      <div class="node gate"><span class="nn">6</span><span class="nt">Itens</span><span class="nd">O wizard mostra quantos itens passam o <span class="gterm" tabindex="0" data-t="Limiar" data-d="O mínimo de documentos (ou de ocorrências) para um item entrar no mapa; parâmetro do método.">limiar</span> e permite escolher quantos entram; o mapa legível tem dezenas, não centenas — e o número escolhido vai para o método</span></div>
+    </div>
+    <div class="two rv">
+      <div class="rule-box"><span class="blabel">Regra</span><p>Cada escolha do wizard é um parâmetro do método: tipo de dado, fonte, tipo de link, unidade, contagem, limiar mínimo, número de itens. Anote os seis no diário na hora — o VOSviewer não os grava no arquivo do mapa, e sem eles ninguém reproduz a figura. A Parte 7 traz a tabela para preencher.</p></div>
+      <div class="note"><span class="blabel">Itens não conectados</span><p>Quando a rede tem itens sem link com o conjunto principal, o VOSviewer pergunta se deve mostrar só o maior conjunto conectado. A resposta muda o mapa (Parte 5 mostra o diálogo com a coautoria real: 60 itens, maior conjunto conectado de 11) e também vai para o método.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s25" data-title="Thesaurus e limpeza">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>4 de 6 · manual 1.6.20, seções 3.5.4 e cap. 4 · OpenRefine como alternativa</span></div>
+    <h2 class="rv">Thesaurus e limpeza: unir «h-index» e «Hirsch index», ignorar termos genéricos, corrigir «AMC Instruments» — antes do mapa, não depois</h2>
+    <div class="two rv">
+      <div>
+        <p class="lead">Nos mapas de texto, o VOSviewer identifica os termos por processamento de linguagem natural (OpenNLP; frases nominais; só em inglês), exclui os que ficam abaixo do mínimo de ocorrências (padrão 10) e os 40 % menos relevantes (padrão). O que sobra ainda traz variantes da mesma coisa e termos que dizem pouco. O thesaurus resolve os dois casos: um arquivo que diz «este rótulo vira aquele» (unir variantes) ou «este rótulo não entra» (ignorar).</p>
+        <div class="tw"><table><thead><tr><th style="width:190px">Problema</th><th>Exemplo real ou do manual</th><th style="width:200px">Solução</th></tr></thead><tbody>
+          <tr><td><b>Variantes do mesmo termo</b></td><td>«h-index» e «Hirsch index» (exemplo do manual)</td><td>Thesaurus: unir sob um rótulo</td></tr>
+          <tr><td><b>Termos genéricos</b></td><td>«study», «result», «approach» — aparecem em todo resumo e não distinguem nada</td><td>Thesaurus: ignorar</td></tr>
+          <tr><td><b>Organização como autor</b></td><td>«AMC Instruments» com 3 documentos no corpus real</td><td>Corrigir no CSV ou ignorar no thesaurus da coautoria</td></tr>
+          <tr><td><b>Nomes não desambiguados</b></td><td>«Silva, J.» e «Silva, João»; «Fan Yang» pode ser mais de uma pessoa</td><td>Conferir nos documentos; unir no thesaurus só com evidência</td></tr>
+        </tbody></table></div>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Limpe antes de mapear e guarde o thesaurus junto com o mapa: ele é parte do método e vai para o repositório (manual de Git). Cada união ou exclusão é uma decisão sua — o thesaurus documenta; a leitura dos documentos justifica. Corpus em português? Os termos do VOSviewer são só em inglês: use o mapa de palavras-chave da base ou traduza e declare.</p></div>
+        <div class="note"><span class="blabel">Alternativa</span><p>O manual do VOSviewer cita o OpenRefine para a limpeza de nomes e termos fora do programa: agrupar variantes, corrigir grafias e exportar de volta o arquivo limpo. O <code>mapa_vosviewer.py</code> faz uma limpeza mínima nos termos (stopwords e descarte do termo curto quando um termo mais longo que o contém tem ≥ 80 % da sua frequência) — o thesaurus ainda é necessário.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s26" data-title="Os arquivos: map, network e JSON">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>5 de 6 · manual 1.6.20, cap. 4 · arquivos gravados pelo mapa_vosviewer.py em 09/09/2026</span></div>
+    <h2 class="rv">Os arquivos: o <em>map file</em> (um item por linha), o <em>network file</em> (um link por linha, formato sparse) e o VOSviewer JSON (os dois juntos)</h2>
+    <div class="two rv">
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:150px">Arquivo</th><th>Colunas (manual, cap. 4)</th><th style="width:230px">O que o script grava</th></tr></thead><tbody>
+          <tr><td><b><span class="gterm" tabindex="0" data-t="Map file · network file" data-d="Os dois arquivos de texto do VOSviewer: um item por linha (id, label, pesos, scores…) e um link por linha (id1, id2, força).">Map file</span></b> (<code>&lt;nome&gt;_map.txt</code>)</td><td><code>id</code>, <code>label</code>, <code>sublabel</code>, <code>description</code>, <code>url</code>, <code>x</code>, <code>y</code>, <code>cluster</code> (1–1000), <code>weight</code>, <code>normalized weight</code>, <code>score</code>, <code>red</code>/<code>green</code>/<code>blue</code></td><td><code>id</code>, <code>label</code>, <code>weight&lt;Documents&gt;</code>, <code>weight&lt;Links&gt;</code>, <code>weight&lt;Total link strength&gt;</code>, <code>score&lt;Avg. pub. year&gt;</code></td></tr>
+          <tr><td><b><span class="gterm" tabindex="0" data-t="Map file · network file" data-d="Os dois arquivos de texto do VOSviewer: um item por linha (id, label, pesos, scores…) e um link por linha (id1, id2, força).">Network file</span></b> (<code>&lt;nome&gt;_network.txt</code>)</td><td>Formato <em>sparse</em>: <code>id1</code>, <code>id2</code>, força — ou a matriz completa</td><td><code>id1</code>, <code>id2</code>, força (sparse)</td></tr>
+          <tr><td><b><span class="gterm" tabindex="0" data-t="VOSviewer JSON" data-d="Um arquivo só com network.items e network.links; é o que o VOSviewer Online abre pelo botão «Open».">VOSviewer JSON</span></b> (<code>&lt;nome&gt;.json</code>)</td><td><code>network.items</code> (id, label, weights, scores) e <code>network.links</code> (source_id, target_id, strength)</td><td>O mesmo conteúdo dos dois arquivos, num só — é o que o VOSviewer Online abre</td></tr>
+          <tr><td><b>Outros</b></td><td>Corpus e scores files (texto), thesaurus, arquivos de cores</td><td>—</td></tr>
+        </tbody></table></div>
+      </div>
+      <div>
+        <div class="code"><div class="code-head">head -4 coautoria_map.txt; head -3 coautoria_network.txt — saída real (Figura 13)</div><pre>id    label            weight&lt;Documents&gt;  weight&lt;Links&gt;  weight&lt;Total link strength&gt;  score&lt;Avg. pub. year&gt;
+1     Prashant Mavani  3                  0              0                            2026.00
+2     Byunghyun Ban    3                  0              0                            2026.00
+3     Xavier Pillet    3                  0              0                            2026.00
+6     5     2
+11    15    2
+11    12    2</pre></div>
+        <div class="rule-box"><span class="blabel">O que o JSON não traz</span><p>Coordenadas (<code>x</code>, <code>y</code>) e <code>cluster</code> não estão nos arquivos do script: são calculados pelo VOSviewer (ou pelo VOSviewer Online) ao abrir, pelo layout e pelo clustering da aba «Analysis». Por isso o mesmo JSON pode dar desenhos ligeiramente diferentes — o que se relata são os parâmetros, não a posição dos círculos.</p></div>
+        <div class="note"><span class="blabel">Lendo as linhas</span><p>Os três autores com 3 documentos têm 0 links e força 0: escreveram sozinhos ou com coautores abaixo do limiar. Já <code>6 5 2</code> diz que os itens 6 e 5 assinaram 2 documentos juntos.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s27" data-title="mapa_vosviewer.py">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer<span>6 de 6 · execução real de 09/09/2026 · Python 3 · corpus de 236 documentos do OpenAlex · contagem completa</span></div>
+    <h2 class="rv"><code>mapa_vosviewer.py</code>: coautoria, termos, fontes ou acoplamento, com limiar declarado — grava map, network e JSON e imprime itens, links, isolados e força total</h2>
+    <figure class="rv"><div class="shot"><img src="capturas/bm_t2_mapas.jpg" width="1920" height="820" alt="Terminal: mapa_vosviewer.py com --tipo coautoria --min 2 (60 itens, 101 links, 13 isolados, força total 202), --tipo termos --min 8 --max-itens 80 (80 itens, 3154 links, força total 39660), --tipo acoplamento --refs crossref_refs.json --min 1 (90 itens, 138 links, 35 isolados, força total 222), e o head dos arquivos map e network"></div><figcaption><b>Figura 13</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): três chamadas do <code>mapa_vosviewer.py</code>. Coautoria com <code>--min 2</code>: «236 documentos → 60 itens (mínimo 2), 101 links, 13 isolados; força total 202». Termos com <code>--min 8 --max-itens 80</code>: «80 itens (mínimo 8), 3154 links; força total 39660». Acoplamento com <code>--refs crossref_refs.json --min 1</code>: «90 itens (mínimo 1), 138 links, 35 isolados; força total 222». Cada chamada grava <code>_map.txt</code>, <code>_network.txt</code> e <code>.json</code> e imprime o top 10 por documentos.</figcaption></figure>
+    <div class="two rv">
+      <div>
+        <div class="code"><div class="code-head">terminal — as quatro redes (o CSV é o da busca; --refs só para o acoplamento)</div><pre>python3 scripts/mapa_vosviewer.py corpus.csv --tipo coautoria   --min 2 --saida coautoria
+python3 scripts/mapa_vosviewer.py corpus.csv --tipo termos      --min 8 --max-itens 80 --saida termos
+python3 scripts/mapa_vosviewer.py corpus.csv --tipo fontes      --min 2 --saida fontes
+python3 scripts/mapa_vosviewer.py corpus.csv --tipo acoplamento --refs crossref_refs.json --min 1 --saida acoplamento
+# --min N: mínimo de documentos por item (padrão 2) · --max-itens: corte (padrão 100) · contagem completa sempre</pre></div>
+      </div>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:130px">Rede</th><th>Unidade · link</th><th style="width:70px">Mínimo</th><th class="num">Itens</th><th class="num">Links</th><th class="num">Isolados</th><th class="num">Força total</th></tr></thead><tbody>
+          <tr><td><b>Coautoria</b></td><td>Autores · documentos em comum</td><td>2 docs</td><td class="num">60</td><td class="num">101</td><td class="num">13</td><td class="num">202</td></tr>
+          <tr><td><b>Termos</b></td><td>N-gramas de 1 a 3 palavras de título + resumo · coocorrência</td><td>8 docs</td><td class="num">80</td><td class="num">3.154</td><td class="num">0</td><td class="num">39.660</td></tr>
+          <tr><td><b>Fontes</b></td><td>Fontes · autores em comum</td><td>2 docs</td><td class="num">26</td><td class="num">4</td><td class="num">19</td><td class="num">—</td></tr>
+          <tr><td><b>Acoplamento</b></td><td>Documentos · referências com DOI em comum (Crossref)</td><td>1 ref.</td><td class="num">90</td><td class="num">138</td><td class="num">35</td><td class="num">222</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>O script imprime exatamente o que a legenda da figura precisa: itens, links, isolados e força total, com o limiar. Ajuste <code>--min</code> até o mapa ter dezenas de itens legíveis e declare o valor final; não esconda os isolados — 13 autores isolados numa coautoria de 60 dizem que a colaboração é esparsa, e isso é resultado. Os isolados dos termos são 0 porque, com 80 termos frequentes, todos coocorrem com algum outro.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===================== PARTE 5 ===================== -->
+<section class="slide divider" id="s28" data-title="Parte 5 · VOSviewer Online passo a passo"><div class="inner"><div class="kicker-part rv">Parte 5<span>VOSviewer Online passo a passo</span></div><h2 class="rv">Abrir o mapa; o mapa de termos; o painel «View»; o overlay por ano médio; a coautoria e o diálogo dos itens não conectados; as fontes; salvar, capturar e compartilhar; a documentação</h2><p class="rv">Sete slides com os mapas reais abertos de verdade em app.vosviewer.com, em 09/09/2026, sem login: os arquivos JSON do <code>mapa_vosviewer.py</code>, carregados pelo botão «Open». Cada número da barra de status é o número do corpus de 236 documentos.</p></div><div class="num">05</div></section>
+
+<section class="slide" id="s29" data-title="Abrir um mapa no VOSviewer Online">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>1 de 7 · app.vosviewer.com · capturas de 09/09/2026 · sem login</span></div>
+    <h2 class="rv">Abrir: a tela de boas-vindas, o botão de pasta «Open», «File type: VOSviewer JSON file» → «JSON file» → o arquivo → «OK»</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_04_vosviewer_online.jpg" width="1920" height="938" alt="Tela de boas-vindas do VOSviewer Online: Visualizing scientific landscapes, com a explicação de que é a versão web do VOSviewer, os exemplos Authors, Journals e Terms e os links para a documentação e os vídeos"></div><figcaption><b>Figura 14</b> app.vosviewer.com (captura de 09/09/2026): «VOSviewer Online — Visualizing scientific landscapes», «ferramenta para visualização de redes; versão web do VOSviewer». Para abrir um mapa, o botão de pasta no canto superior direito; ou um dos exemplos «Authors», «Journals» e «Terms». Não há login nem conta.</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_v0_dialogo_open.jpg" width="1920" height="938" alt="Diálogo Open do VOSviewer Online: File type VOSviewer JSON file, botão JSON file, No file selected, botões OK e Cancel"></div><figcaption><b>Figura 15</b> O diálogo «Open» (captura de 09/09/2026): «File type» com «VOSviewer JSON file» (a alternativa é o par map/network), o botão «JSON file» com «No file selected», e «OK» / «Cancel». O arquivo escolhido é o <code>termos.json</code>, <code>coautoria.json</code> ou <code>fontes.json</code> gravado pelo script.</figcaption></figure>
+    </div>
+    <div class="two rv">
+      <div class="flow">
+        <div class="node"><span class="nn">1</span><span class="nt">app.vosviewer.com</span><span class="nd">Feche a tela de boas-vindas («Close») ou clique num exemplo para conhecer a interface</span></div>
+        <div class="node"><span class="nn">2</span><span class="nt">Botão de pasta («Open»)</span><span class="nd">No canto superior direito, ao lado de Save, Screenshot, dark mode, Info e tela cheia</span></div>
+        <div class="node"><span class="nn">3</span><span class="nt">«File type»</span><span class="nd">«<span class="gterm" tabindex="0" data-t="VOSviewer JSON" data-d="Um arquivo só com network.items e network.links; é o que o VOSviewer Online abre pelo botão «Open».">VOSviewer JSON</span> file» para o <code>.json</code> do script; ou map/network para o par <code>_map.txt</code> + <code>_network.txt</code></span></div>
+        <div class="node gate"><span class="nn">4</span><span class="nt">«JSON file» → «OK»</span><span class="nd">Escolha o arquivo no seu computador; o mapa abre com layout e clusters calculados na hora</span></div>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Use o <strong>upload pelo botão «Open»</strong>. O VOSviewer Online também aceita parâmetros de URL (<code>json=</code>, <code>map=</code>, <code>network=</code>) para abrir um arquivo hospedado na web — mas um JSON servido de <code>localhost</code> <em>não abriu</em> por URL na demonstração (o app não encontrou o arquivo); o upload funcionou. Para compartilhar por URL, o arquivo precisa estar num endereço público (slide «Salvar, capturar e compartilhar»).</p></div>
+        <div class="note"><span class="blabel">O que fica onde</span><p>O arquivo é lido pelo navegador; o layout e os clusters são calculados ao abrir (o JSON não traz <code>x</code>, <code>y</code> nem <code>cluster</code>). Documentação: app.vosviewer.com/docs (CC BY 4.0; «Copyright 2021-2022 Nees Jan van Eck and Ludo Waltman»).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s30" data-title="O mapa de termos">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>2 de 7 · execução real · corpus de 236 documentos do OpenAlex · captura de 09/09/2026</span></div>
+    <h2 class="rv">O mapa de termos: 80 itens, 3.154 links, força total 39.660, 2 clusters — cada círculo é um termo, o tamanho é o nº de documentos, a cor é o cluster</h2>
+    <figure class="rv"><div class="shot"><img src="capturas/bm_v2_online_termos.jpg" width="1920" height="938" alt="Mapa de termos no VOSviewer Online: 80 termos em dois clusters, vermelho e verde, com predictive maintenance ao centro; barra de status Items 80, Links 3154, Total link strength 39660, Clusters 2"></div><figcaption><b>Figura 16</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): <code>termos.json</code> aberto no VOSviewer Online. Barra de status: «Items: 80 | Links: 3154 | Total link strength: 39660 | Clusters: 2». Os termos vêm de título + resumo, n-gramas de 1 a 3 palavras, mínimo de 8 documentos, contagem completa; o maior círculo é «predictive maintenance», o termo da própria string de busca.</figcaption></figure>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:170px">No mapa</th><th>O que significa</th></tr></thead><tbody>
+        <tr><td><b>Círculo</b> (item)</td><td>Um termo; tamanho = peso «Documents» (em quantos documentos aparece)</td></tr>
+        <tr><td><b>Linha</b> (link)</td><td>Os dois termos coocorrem em pelo menos um documento; espessura = força (nº de documentos em que coocorrem)</td></tr>
+        <tr><td><b>Cor</b> (cluster)</td><td>O grupo em que o algoritmo pôs o termo; aqui só dois: vermelho e verde</td></tr>
+        <tr><td><b>Distância</b></td><td>Termos que coocorrem muito ficam perto; a posição exata é calculada ao abrir e não é um dado</td></tr>
+        <tr><td><b>Barra de status</b></td><td>Os quatro números da legenda: itens, links, força total, clusters</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>Chamar os dois clusters de «os dois temas do campo».</strong> São 2 clusters de um corpus pequeno (236 documentos), dominado pelo ano corrente (111 de 2026) e com um termo — o da string de busca — no centro de tudo. Antes de dar nome a um cluster, leia os documentos em que os termos dele aparecem (Parte 7). O rótulo é provisório e é seu.</p></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Na legenda da figura: base, data, <em>n</em>, unidade (termos de título e resumo), tipo de link (coocorrência), contagem, limiar (mínimo 8 documentos), itens (80), links (3.154), força total (39.660), clusters (2) e o software com a versão. É o slide «A seção de método» em uma frase.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s31" data-title="O painel View: Items, Links e cores">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>3 de 7 · execução real · corpus de 236 documentos do OpenAlex · captura de 09/09/2026</span></div>
+    <h2 class="rv">O painel lateral, aba «View»: Visualization, Items (Size, Color), Links (Minimum strength, Maximum links) e Color schemes</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_v4_online_termos_painel.jpg" width="1920" height="938" alt="Mapa de termos no VOSviewer Online com o painel View aberto: Visualization Scale; Items Size Documents, Color Clusters, Size variation, Maximum label length 30; Links Size variation, Minimum strength 0, Maximum links 1000, Curved links; Color schemes Cluster colors, Score colors Viridis"></div><figcaption><b>Figura 17</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): o mesmo mapa de termos com o painel aberto (seta à esquerda), aba «View». «Items: 80 | Links: 3154 | Total link strength: 39660 | Clusters: 2». «Size: Documents», «Color: Clusters», «Maximum label length: 30», «Minimum strength: 0», «Maximum links: 1000», «Curved links» ligado, «Score colors: Viridis».</figcaption></figure>
+      <div class="tw"><table><thead><tr><th style="width:130px">Seção</th><th style="width:170px">Opção</th><th>Para quê</th></tr></thead><tbody>
+        <tr><td><b>Visualization</b></td><td>Scale</td><td>Amplia ou reduz círculos e rótulos em conjunto</td></tr>
+        <tr><td rowspan="4"><b>Items</b></td><td>Size</td><td>Qual peso dá o tamanho: «Documents», «Links», «<span class="gterm" tabindex="0" data-t="Força total (Total link strength)" data-d="A soma das forças dos links de um item — ou de toda a rede, na barra de status.">Total link strength</span>»…</td></tr>
+        <tr><td>Color</td><td>«Clusters» (a cor é o grupo) ou um score («Avg. pub. year» → overlay, slide seguinte)</td></tr>
+        <tr><td>Size variation</td><td>Quanto o tamanho varia entre o item mais leve e o mais pesado</td></tr>
+        <tr><td>Maximum label length</td><td>Corta rótulos longos (30 na captura)</td></tr>
+        <tr><td rowspan="4"><b>Links</b></td><td>Size variation</td><td>Quanto a espessura varia com a força</td></tr>
+        <tr><td>Minimum strength</td><td>Esconde links fracos — não os apaga da rede</td></tr>
+        <tr><td>Maximum links</td><td>Mostra só os N mais fortes (1000 por padrão)</td></tr>
+        <tr><td>Curved links</td><td>Linhas curvas ou retas</td></tr>
+        <tr><td><b>Color schemes</b></td><td>Cluster colors · Score colors</td><td>A paleta dos clusters; a barra de cores dos scores («Viridis»)</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="two rv">
+      <div class="rule-box"><span class="blabel">Regra</span><p>O painel muda o <em>desenho</em>, não a <em>rede</em>: «Minimum strength» e «Maximum links» escondem linhas, mas itens, links e força total da barra de status continuam os mesmos. Se a figura do artigo esconde links, a legenda diz («links com força ≥ 2»). As outras abas do painel são «Find» e «Update».</p></div>
+      <div class="note"><span class="blabel">Legibilidade</span><p>Para a figura impressa, suba «Scale» e «Maximum label length» até os rótulos ficarem legíveis, ou reduza o número de itens no script (<code>--max-itens</code>) — o segundo caminho é um parâmetro do método; o primeiro, só do desenho.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s32" data-title="Overlay por ano médio de publicação">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>4 de 7 · execução real · corpus de 236 documentos do OpenAlex · captura de 09/09/2026</span></div>
+    <h2 class="rv">Overlay por ano médio: «Color: Avg. pub. year» pinta cada termo pela média do ano dos documentos em que aparece — azul é mais antigo, amarelo é mais recente</h2>
+    <figure class="rv"><div class="shot"><img src="capturas/bm_v5_online_termos_overlay.jpg" width="1920" height="938" alt="Mapa de termos no VOSviewer Online colorido por Avg. pub. year, com a barra de cores Viridis no canto inferior direito; painel View com Color Avg. pub. year"></div><figcaption><b>Figura 18</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): o mesmo mapa de termos com «Color: Avg. pub. year» — a visualização overlay. A barra de cores (Viridis) aparece no canto inferior direito; o score <code>score&lt;Avg. pub. year&gt;</code> vem do map file gravado pelo script. «Items: 80 | Links: 3154 | Total link strength: 39660».</figcaption></figure>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:190px">Score (manual, cap. 2)</th><th>O que a cor passa a dizer</th></tr></thead><tbody>
+        <tr><td><b>Avg. pub. year</b></td><td>A média do ano de publicação dos documentos em que o item aparece — termos «novos» × «antigos» dentro do corpus</td></tr>
+        <tr><td><b>Pub. year</b></td><td>O ano de um documento (mapas de documentos)</td></tr>
+        <tr><td><b>Citations · Avg. citations</b></td><td>Citações do item ou média por documento — só se o arquivo trouxer citações</td></tr>
+        <tr><td><b>Norm. citations</b></td><td>Citações normalizadas, para comparar itens que não teriam a mesma chance de ser citados</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="trap"><span class="blabel">Armadilha</span><p><strong>Ler o amarelo como «tendência».</strong> Num corpus em que 111 de 236 documentos são de 2026, quase tudo tem ano médio recente, e a barra de cores cobre um intervalo curto. O overlay diz o que é <em>relativamente</em> mais novo dentro deste corpus, nesta data — não o que «vai crescer». Escreva a faixa da barra de cores na legenda.</p></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Uma figura Network e uma Overlay do mesmo mapa contam duas coisas diferentes: grupos e tempo. Se usar as duas, diga que é o mesmo mapa (mesmos itens, links e limiar) e o que muda é só a cor.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s33" data-title="Coautoria e o diálogo dos itens não conectados">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>5 de 7 · execução real · corpus de 236 documentos do OpenAlex · capturas de 09/09/2026</span></div>
+    <h2 class="rv">Coautoria: 60 autores, 101 links, 25 clusters — e o diálogo «Some of the 60 items in your network are not connected to each other»</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_v1_online_coautoria.jpg" width="1920" height="938" alt="Mapa de coautoria no VOSviewer Online com todos os 60 autores, espalhados e com poucas linhas visíveis; barra de status Items 60, Links 101, Total link strength 202, Clusters 25"></div><figcaption><b>Figura 19</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): <code>coautoria.json</code> aberto com «No» no diálogo — todos os itens. «Items: 60 | Links: 101 | Total link strength: 202 | Clusters: 25». Muitos clusters pequenos e 13 isolados: a colaboração no corpus é esparsa.</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_v1b_online_coautoria_conectado.jpg" width="1920" height="938" alt="Mapa de coautoria no VOSviewer Online mostrando só o maior conjunto de itens conectados, um grupo denso em vermelho, num único cluster"></div><figcaption><b>Figura 20</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): o mesmo arquivo com «Yes» — só o maior conjunto conectado. O diálogo dizia: «Some of the 60 items in your network are not connected to each other. The largest set of connected items consists of 11 items. Do you want to show this set of items instead of all items?». O grupo denso é um único conjunto de coautores.</figcaption></figure>
+    </div>
+    <div class="two rv">
+      <div class="compare">
+        <div><div class="cmp-h">«No» — todos os itens (Figura 19)</div><ul>
+          <li>Mostra a rede inteira, inclusive os 13 isolados e os pares soltos</li>
+          <li>É a figura honesta para dizer «a colaboração é esparsa»: 60 autores em 25 clusters</li>
+          <li>Rótulos espalhados, pouca linha visível</li>
+        </ul></div>
+        <div><div class="cmp-h">«Yes» — o maior conjunto conectado (Figura 20)</div><ul>
+          <li>Mostra só o grupo que se liga entre si: 11 itens, segundo o diálogo</li>
+          <li>Serve para descrever <em>esse</em> grupo — não o campo</li>
+          <li>A legenda precisa dizer que é um subconjunto e qual</li>
+        </ul></div>
+      </div>
+      <div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>A resposta ao diálogo é um parâmetro do método: «mapa com todos os 60 itens» ou «maior conjunto conectado (11 itens)». O manual do VOSviewer desktop faz a mesma pergunta ao criar o mapa. Antes de interpretar qualquer grupo, confira a desambiguação dos nomes (Parte 4): um autor grafado de duas formas vira dois círculos.</p></div>
+        <div class="note"><span class="blabel">O que 25 clusters dizem</span><p>Com 60 itens e 101 links, cada pequeno grupo de coautores vira um cluster próprio. Não são «25 comunidades científicas»: são os grupos de pessoas que assinaram juntas ao menos 2 documentos do corpus até 09/09/2026.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s34" data-title="Fontes ligadas por autores em comum">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>6 de 7 · execução real · corpus de 236 documentos do OpenAlex · captura de 09/09/2026</span></div>
+    <h2 class="rv">Fontes: 26 itens, 4 links, 19 isolados — o que um mapa quase sem linhas diz sobre o corpus (e sobre os repositórios contados como «fonte»)</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_v3_online_fontes.jpg" width="1920" height="938" alt="Mapa de fontes no VOSviewer Online: 26 fontes espalhadas, quase sem linhas, com Zenodo como o maior círculo, seguido de arXiv e SSRN Electronic Journal"></div><figcaption><b>Figura 21</b> Execução real; corpus de 236 documentos do OpenAlex (captura de 09/09/2026): <code>fontes.json</code> — fontes com pelo menos 2 documentos, ligadas quando têm autores em comum. 26 itens, 4 links, 19 isolados; ao abrir, o diálogo dos itens não conectados informou que o maior conjunto conectado tem 3 itens. O maior círculo é «Zenodo (CERN European Organiza…»; «arXiv (Cornell University)» e «SSRN Electronic Journal» vêm em seguida — repositórios, não periódicos.</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:190px">O que se vê</th><th>O que isso diz do corpus</th></tr></thead><tbody>
+          <tr><td><b>Quase nenhuma linha</b> (4 links em 26 itens)</td><td>Os autores do corpus raramente publicam em mais de uma fonte com 2+ documentos: o campo está disperso por muitos veículos</td></tr>
+          <tr><td><b>19 isolados</b></td><td>A maioria das fontes não compartilha autor com nenhuma outra</td></tr>
+          <tr><td><b>Maior conjunto: 3 itens</b></td><td>O único «circuito» de fontes com autores em comum tem três veículos</td></tr>
+          <tr><td><b>Zenodo, arXiv, SSRN no topo</b></td><td>O peso está em repositórios de preprints e depósitos, não em periódicos — a lição da Parte 3 vista no mapa</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Um mapa vazio também é resultado: «não há <span class="gterm" tabindex="0" data-t="Citação (rede de)" data-d="Rede em que um documento (fonte, autor…) se liga ao que cita, dentro do corpus.">rede de</span> fontes por autores em comum neste corpus» é uma frase que se escreve. O que não se faz é baixar o limiar até aparecerem linhas e apresentar o desenho como se fosse estrutura. Se o interesse é «onde o campo publica», a tabela de fontes por tipo (Parte 3) responde melhor do que este mapa.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s35" data-title="Salvar, capturar, compartilhar e a documentação">
+  <div class="inner">
+    <div class="kicker-part rv">VOSviewer Online<span>7 de 7 · app.vosviewer.com/docs · captura de 09/09/2026</span></div>
+    <h2 class="rv">Salvar, capturar e compartilhar: os botões da barra — Open, Save, Screenshot, dark mode, Info, tela cheia — e a documentação oficial</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_05_vosviewer_online_docs.jpg" width="1920" height="938" alt="VOSviewer Online Docs: Welcome to VOSviewer Online Docs, com as seções User interface, File types, Sharing a visualization, Examples e Videos"></div><figcaption><b>Figura 22</b> app.vosviewer.com/docs (captura de 09/09/2026): «Welcome to VOSviewer Online Docs», com «User interface», «File types», «Sharing a visualization», «Examples» e «Videos». Licença CC BY 4.0; «Copyright 2021-2022 Nees Jan van Eck and Ludo Waltman».</figcaption></figure>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:150px">Botão (barra superior direita)</th><th>O que faz</th></tr></thead><tbody>
+          <tr><td><b>Open</b> (pasta)</td><td>Abre o diálogo da Figura 15: JSON ou map/network</td></tr>
+          <tr><td><b>Save</b></td><td>Grava o mapa como arquivo do VOSviewer, para reabrir ou compartilhar</td></tr>
+          <tr><td><b>Screenshot</b></td><td>Salva a imagem do mapa como está na tela — é a figura que vai para o artigo, com a legenda completa</td></tr>
+          <tr><td><b>Dark mode</b></td><td>Fundo escuro; para impressão, use o claro</td></tr>
+          <tr><td><b>Info</b></td><td>Informações sobre o app, com os links para a documentação e os vídeos</td></tr>
+          <tr><td><b>Tela cheia</b></td><td>Só o mapa, sem o navegador — bom para apresentar</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Guarde três coisas: o <code>.json</code> (a rede), a captura («Screenshot») e o diário com os parâmetros. Para compartilhar um mapa interativo, o arquivo JSON precisa estar num endereço público e ser aberto com o parâmetro <code>json=</code> na URL do app — o que a documentação chama de «Sharing a visualization»; um arquivo em <code>localhost</code> não serviu na demonstração.</p></div>
+        <div class="note"><span class="blabel">Manuais irmãos</span><p>O JSON e a captura vão para o repositório com o texto (<a href="https://git.mirandastech.com.br/">Git</a>) e para o repositório de dados (<a href="https://dados.mirandastech.com.br/">Dados</a>); a figura entra no <code>.tex</code> com a legenda completa (<a href="https://latex.mirandastech.com.br/">LaTeX</a>).</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ===================== PARTE 6 ===================== -->
+<section class="slide divider" id="s36" data-title="Parte 6 · Bibliometrix e outros"><div class="inner"><div class="kicker-part rv">Parte 6<span>Bibliometrix e outros</span></div><h2 class="rv">bibliometrix 5.5.0 e biblioshiny: instalar e abrir em R; CiteSpace em uma linha; Van Eck e Waltman (2010) e como citar as ferramentas</h2><p class="rv">A alternativa em R ao VOSviewer, descrita pelo CRAN e pelo site oficial em 09/09/2026 — o pacote <strong>não foi executado</strong> para este manual (R não instalado), e os menus internos do biblioshiny não são descritos. Depois, o CiteSpace em uma linha e a referência que todo artigo com mapa do VOSviewer precisa citar.</p></div><div class="num">06</div></section>
+
+<section class="slide" id="s37" data-title="bibliometrix 5.5.0 e biblioshiny">
+  <div class="inner">
+    <div class="kicker-part rv">Bibliometrix e outros<span>1 de 2 · cran.r-project.org · bibliometrix.org · github.com/massimoaria/bibliometrix · capturas de 09/09/2026 · não executado</span></div>
+    <h2 class="rv">bibliometrix 5.5.0 e biblioshiny: o pacote R (GPL-3) que importa Scopus, Web of Science, Dimensions, OpenAlex, Cochrane, Lens e PubMed — e a interface web «sem código»</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_06_bibliometrix_home.jpg" width="1920" height="938" alt="Página inicial de bibliometrix.org: The Complete Science Mapping Platform, com o logotipo Bibliometrix AI e os menus Features, Tutorials, Download, Education, Products, About e FAQ"></div><figcaption><b>Figura 23</b> bibliometrix.org (captura de 09/09/2026): «The Complete Science Mapping Platform». O site anuncia «Biblio AI» (v5.0); a página específica do biblioshiny devolveu 404 nesta data — por isso este manual não descreve os menus do biblioshiny.</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_08_cran_bibliometrix.jpg" width="1920" height="938" alt="Página do pacote bibliometrix no CRAN: Comprehensive Science Mapping Analysis, versão 5.5.0, publicado em 2026-08-29, R maior ou igual a 3.5.0, licença GPL-3, autores Massimo Aria e Corrado Cuccurullo"></div><figcaption><b>Figura 24</b> CRAN, pacote bibliometrix (captura de 09/09/2026): versão <b>5.5.0</b>, publicada em 29/08/2026; «ferramenta para pesquisa quantitativa em cientometria e bibliometria»; exige R ≥ 3.5.0; licença GPL-3; autores Massimo Aria (mantenedor) e Corrado Cuccurullo; importa dados de Scopus, Web of Science, Dimensions, OpenAlex, Cochrane Library, Lens e PubMed.</figcaption></figure>
+    </div>
+    <div class="two rv">
+      <div class="code"><div class="code-head">R — instalar e abrir (o pacote não foi executado para este manual; comandos do CRAN e do README oficial)</div><pre>install.packages("bibliometrix")   # uma vez, no R (≥ 3.5.0)
+library(bibliometrix)
+biblioshiny()                      # abre a interface web no navegador</pre></div>
+      <div>
+        <div class="tw"><table><thead><tr><th style="width:170px">O que importa saber</th><th>Fonte (09/09/2026)</th></tr></thead><tbody>
+          <tr><td><b>O que é</b></td><td>Pacote R para «pesquisa quantitativa em cientometria e bibliometria»; o biblioshiny é a interface web (Shiny) «sem código» (CRAN e site)</td></tr>
+          <tr><td><b>Fluxo</b></td><td>O README no GitHub (massimoaria/bibliometrix) descreve o fluxo SAAS e cita o livro <em>Science Mapping Analysis: A Primer with Biblioshiny</em></td></tr>
+          <tr><td><b>Quando escolher</b></td><td>Quando você já trabalha em R, quer as tabelas e os gráficos além dos mapas, ou precisa importar OpenAlex, Cochrane ou Lens diretamente</td></tr>
+          <tr><td><b>Citar</b></td><td>Aria e Cuccurullo, <em>Journal of Informetrics</em>, 2017 (slide seguinte)</td></tr>
+        </tbody></table></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>As mesmas regras valem: um mapa de uma base só, limiares e contagem declarados, versão do pacote no método («bibliometrix 5.5.0»). O que este manual não faz é descrever os menus do biblioshiny — porque não os viu; quando você abrir, os nomes da sua tela é que valem.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s38" data-title="CiteSpace e como citar as ferramentas">
+  <div class="inner">
+    <div class="kicker-part rv">Bibliometrix e outros<span>2 de 2 · citespace.podia.com · Springer (Scientometrics, 2010) · capturas de 09/09/2026</span></div>
+    <h2 class="rv">CiteSpace em uma linha — e como citar as ferramentas: Van Eck e Waltman (2010) para o VOSviewer, Aria e Cuccurullo (2017) para o Bibliometrix, Chen (2006) para o CiteSpace</h2>
+    <div class="two rv">
+      <figure><div class="shot"><img src="capturas/bm_16_citespace.jpg" width="1920" height="938" alt="Página do CiteSpace com o anúncio New Release CiteSpace 7.0.2 para Windows 11 e Mac, os menus Blogs, Exemplars, Gallery, FAQs e o botão Login"></div><figcaption><b>Figura 25</b> citespace.podia.com (captura de 09/09/2026): «CiteSpace 7.0.2» anunciado para Windows 11 e Mac; «Advanced version». É uma terceira ferramenta de mapeamento científico, com ênfase em tendências emergentes (Chen, 2006); este manual não o executou e não traz preços.</figcaption></figure>
+      <figure><div class="shot"><img src="capturas/bm_21_vaneck_2010.jpg" width="1920" height="938" alt="Página da Springer do artigo Software survey: VOSviewer, a computer program for bibliometric mapping, Scientometrics, volume 84, páginas 523–538, 2010, acesso aberto, publicado em 31 de dezembro de 2009"></div><figcaption><b>Figura 26</b> Springer (captura de 09/09/2026): «Software survey: VOSviewer, a computer program for bibliometric mapping», <em>Scientometrics</em>, v. 84, p. 523–538 (2010), publicado on-line em 31/12/2009, acesso aberto. É a referência do VOSviewer.</figcaption></figure>
+    </div>
+    <div class="tw rv"><table><thead><tr><th style="width:130px">Ferramenta</th><th>Referência (padrão ABNT; conferir com a biblioteca)</th><th style="width:230px">DOI</th></tr></thead><tbody>
+      <tr><td><b>VOSviewer</b></td><td>VAN ECK, N. J.; WALTMAN, L. Software survey: VOSviewer, a computer program for bibliometric mapping. <em>Scientometrics</em>, v. 84, p. 523-538, 2010.</td><td class="mono">10.1007/s11192-009-0146-3</td></tr>
+      <tr><td><b>Bibliometrix</b></td><td>ARIA, M.; CUCCURULLO, C. bibliometrix: An R-tool for comprehensive science mapping analysis. <em>Journal of Informetrics</em>, v. 11, n. 4, p. 959-975, 2017.</td><td class="mono">10.1016/j.joi.2017.08.007</td></tr>
+      <tr><td><b>CiteSpace</b></td><td>CHEN, C. CiteSpace II: Detecting and visualizing emerging trends and transient patterns in scientific literature. <em>JASIST</em>, 2006.</td><td class="mono">10.1002/asi.20317</td></tr>
+    </tbody></table></div>
+    <div class="rule-box rv"><span class="blabel">Regra</span><p>Cite a ferramenta <em>e</em> a versão no método: «VOSviewer 1.6.20 (Van Eck; Waltman, 2010)» ou «bibliometrix 5.5.0 (Aria; Cuccurullo, 2017)». O VOSviewer Online cita-se pela mesma referência de 2010, indicando «VOSviewer Online, app.vosviewer.com, acesso em (data)». A referência vai para o Zotero (manual irmão) como qualquer artigo.</p></div>
+  </div>
+</section>
+
+<!-- ===================== PARTE 7 ===================== -->
+<section class="slide divider" id="s39" data-title="Parte 7 · Relatar e fechar"><div class="inner"><div class="kicker-part rv">Parte 7<span>Relatar e fechar</span></div><h2 class="rv">A seção de método bibliométrico; ler clusters sem inventar temas; tudo num só plugin; erros comuns; checklist; glossário; referências; como citar</h2><p class="rv">O mapa só vale se outra pessoa conseguir refazê-lo: base, string, data, <em>n</em>, software e versão, tipo de link, contagem, limiares, itens, links e clusters. Depois, a regra para nomear clusters, o agente que roda os scripts, o que costuma dar errado, a lista para conferir, os termos e as fontes.</p></div><div class="num">07</div></section>
+
+<section class="slide" id="s40" data-title="A seção de método bibliométrico">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>1 de 9 · o que declarar · exemplo com os números reais de 09/09/2026</span></div>
+    <h2 class="rv">A seção de método bibliométrico: onze itens que todo mapa declara — e um parágrafo de exemplo com o corpus real</h2>
+    <div class="two rv">
+      <div class="tw"><table><thead><tr><th style="width:40px">#</th><th style="width:190px">Declarar</th><th>No corpus real (09/09/2026)</th></tr></thead><tbody>
+        <tr><td class="num">1</td><td><b>Base</b> e ferramenta de exportação</td><td>OpenAlex, API, <code>buscar_openalex.py</code></td></tr>
+        <tr><td class="num">2</td><td><b>String</b> e campos</td><td><code>"predictive maintenance" AND (port OR terminal OR crane)</code>, em título e resumo</td></tr>
+        <tr><td class="num">3</td><td><b>Data</b> da busca e da extração de citações</td><td>09/09/2026 (busca); 09/09/2026 (Crossref)</td></tr>
+        <tr><td class="num">4</td><td><b><em>n</em></b>, período e tipos</td><td>236 documentos; 2015–2026; article, book-chapter, preprint</td></tr>
+        <tr><td class="num">5</td><td><b>Software e versão</b></td><td><code>mapa_vosviewer.py</code>; VOSviewer Online (app.vosviewer.com); manual do VOSviewer 1.6.20</td></tr>
+        <tr><td class="num">6</td><td><b>Tipo de link</b> e unidade</td><td>Coocorrência de termos (título + resumo, n-gramas de 1 a 3 palavras)</td></tr>
+        <tr><td class="num">7</td><td><b>Contagem</b></td><td>Completa</td></tr>
+        <tr><td class="num">8</td><td><b>Limiares</b></td><td>Mínimo de 8 documentos por termo; 80 itens</td></tr>
+        <tr><td class="num">9</td><td><b>Itens, links, força total, clusters</b></td><td>80 · 3.154 · 39.660 · 2</td></tr>
+        <tr><td class="num">10</td><td><b>Limpeza</b></td><td>Stopwords; descarte do termo curto contido num mais longo com ≥ 80 % da frequência; sem thesaurus</td></tr>
+        <tr><td class="num">11</td><td><b>Itens não conectados</b> e visualização</td><td>Todos os itens; Network e Overlay por «Avg. pub. year»</td></tr>
+      </tbody></table></div>
+      <div>
+        <div class="case"><span class="blabel">Exemplo — parágrafo de método (números reais)</span><p>«O corpus foi exportado do OpenAlex em 09/09/2026 pela API, com a string <code>"predictive maintenance" AND (port OR terminal OR crane)</code> em título e resumo, período 2015–2026 e tipos <em>article</em>, <em>book-chapter</em> e <em>preprint</em>, totalizando 236 documentos (226 com DOI). As contagens de citação vieram do Crossref na mesma data (196 de 226 DOIs respondidos). O mapa de coocorrência de termos foi construído a partir de título e resumo (n-gramas de 1 a 3 palavras, stopwords removidas), com contagem completa e mínimo de 8 documentos por termo, resultando em 80 itens, 3.154 links, força total 39.660 e 2 clusters, e visualizado no VOSviewer Online (app.vosviewer.com), seguindo o manual do VOSviewer 1.6.20 (Van Eck; Waltman, 2010). Os arquivos <code>corpus.csv</code>, <code>crossref_refs.json</code> e <code>termos.json</code> acompanham o texto.»</p><span class="src">Fonte dos números: Figuras 10, 13, 16 e 17. Troque pelos seus e mantenha a estrutura.</span></div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>Se um dos onze itens não couber no texto, vai para o material suplementar — nunca some. Sem os limiares e a contagem, o leitor não consegue reproduzir o mapa; sem a data, não consegue nem entender por que o dele deu diferente.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s41" data-title="Ler clusters sem inventar temas">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>2 de 9 · a regra de interpretação · Donthu et al. (2021) · Leiden, princípio 1</span></div>
+    <h2 class="rv">Ler clusters sem inventar temas: o algoritmo agrupa termos que coocorrem; o «tema» é uma leitura sua, feita com os documentos na mão</h2>
+    <div class="two rv">
+      <div>
+        <div class="flow">
+          <div class="node"><span class="nn">1</span><span class="nt">Liste os termos do cluster</span><span class="nd">Pelo <span class="gterm" tabindex="0" data-t="Map file · network file" data-d="Os dois arquivos de texto do VOSviewer: um item por linha (id, label, pesos, scores…) e um link por linha (id1, id2, força).">map file</span> (coluna <code>cluster</code> depois de salvar no VOSviewer) ou pela cor no mapa</span></div>
+          <div class="node"><span class="nn">2</span><span class="nt">Ache os documentos</span><span class="nd">No CSV, os documentos em que os termos mais pesados do cluster aparecem — leia títulos e resumos</span></div>
+          <div class="node"><span class="nn">3</span><span class="nt">Rótulo provisório</span><span class="nd">Uma frase, não uma palavra; com dois ou três documentos citados como exemplo</span></div>
+          <div class="node"><span class="nn">4</span><span class="nt">Teste o contrário</span><span class="nd">Há termos no cluster que não cabem no rótulo? Há documentos do «tema» em outro cluster? Diga</span></div>
+          <div class="node gate"><span class="nn">5</span><span class="nt">Relate como leitura</span><span class="nd">«O cluster 1 reúne termos ligados a…; por exemplo, os documentos X e Y» — nunca «o campo se divide em dois temas»</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="compare">
+          <div><div class="cmp-h">Escreve-se</div><ul>
+            <li>«O mapa de termos (80 itens, mínimo 8 documentos) formou 2 clusters; o cluster vermelho reúne, entre outros, os termos «monitoring», «sensor» e «failure», presentes, por exemplo, em [dois documentos]»</li>
+            <li>«A coautoria é esparsa: 60 autores em 25 clusters, 13 isolados; o maior conjunto conectado tem 11 itens»</li>
+            <li>«Até 09/09/2026, 111 dos 236 documentos são de 2026»</li>
+          </ul></div>
+          <div><div class="cmp-h">Não se escreve</div><ul>
+            <li>«O campo se organiza em dois grandes temas»</li>
+            <li>«Os autores X, Y e Z lideram a pesquisa na área» (3 documentos cada)</li>
+            <li>«A produção explodiu em 2026»</li>
+            <li>«O cluster verde é o futuro da área» (overlay lido como previsão)</li>
+          </ul></div>
+        </div>
+        <div class="rule-box"><span class="blabel">Regra</span><p>O mapa <em>ilustra</em> a revisão; a revisão é a leitura dos documentos (Leiden, princípio 1; Donthu et al., 2021, sobre como conduzir uma análise bibliométrica). Cluster não é tema pronto: é um agrupamento estatístico de coocorrências num corpus, numa data, com um limiar. Nomeie com evidência, cite exemplos, e deixe registrado o que não coube no rótulo.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s42" data-title="Tudo num só plugin">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>3 de 9</span></div>
+    <h2 class="rv">Tudo num só plugin: a skill <code>bibliometria-vosviewer</code> roda os scripts e explica cada rede; o aluno decide o corpus, os limiares e a interpretação</h2>
+    <div class="two rv">
+      <div>
+        <p class="lead">O <a href="https://plugin.mirandastech.com.br/">plugin Pesquisa MirandasTech</a> (para Claude Code e Codex) coloca os papéis dos manuais dentro do assistente, com um estado único (<code>PROGRESSO.md</code>) e um gerente — o Pesquisador — que só fecha uma fase com evidência. A skill <code>bibliometria-vosviewer</code> segue este manual: confirma o corpus e o diário, roda o <code>indicadores_bibliometricos.py</code> e o <code>mapa_vosviewer.py</code>, explica o que cada rede mede, ajuda a escrever a seção de método e registra os arquivos gerados — mas não decide o limiar nem nomeia os clusters por você.</p>
+        <div class="tw"><table><thead><tr><th style="width:190px">Papel</th><th>O que faz com este manual</th><th style="width:120px">Slides</th></tr></thead><tbody>
+          <tr><td><b>Pesquisador</b></td><td>Confere que o corpus tem diário, que os indicadores e os mapas têm arquivo de origem e data, e que a seção de método traz os onze itens</td><td>Partes 1, 3 e 7</td></tr>
+          <tr><td><b>Skill bibliometria-vosviewer</b></td><td>Roda os dois scripts, lê a saída com o aluno, gera map/network/JSON, orienta a abrir no VOSviewer ou no VOSviewer Online e a preencher o método</td><td>Partes 3 a 7</td></tr>
+          <tr><td><b>Bibliotecário</b></td><td>Confere as referências das ferramentas no Zotero (Van Eck; Waltman, 2010; Aria; Cuccurullo, 2017)</td><td>Parte 6</td></tr>
+          <tr><td><b>Orientador (uso de IA)</b></td><td>Declara o uso do assistente na análise e no texto</td><td>Último slide</td></tr>
+        </tbody></table></div>
+      </div>
+      <div>
+        <div class="code"><div class="code-head">Claude Code — pedidos na pasta do projeto (o plugin lê PROGRESSO.md)</div><pre>Pesquisador, onde paramos?
+Rode os indicadores bibliométricos do corpus.csv e me explique a tabela de fontes.
+Gere a rede de coautoria com mínimo 2 e me diga quantos isolados há.
+Monte o mapa de termos com mínimo 8 e prepare o JSON para o VOSviewer Online.
+Escreva o rascunho da seção de método bibliométrico com os parâmetros usados.
+/pesquisa:status
+/pesquisa:proxima</pre></div>
+        <div class="rule-box"><span class="blabel">O que a skill recusa</span><p>«Ranqueia os autores para eu dizer quem é o melhor» — produção não é qualidade (Leiden, DORA). «Junta a exportação do Scopus com a do OpenAlex» — bases diferentes não se somam num mapa. «Nomeia os clusters para mim» — propõe rótulos provisórios com os documentos de cada cluster; o aluno lê e decide. «Usa o fator de impacto para escolher onde publicar» — explica a DORA e sugere escopo e política de acesso aberto.</p></div>
+        <div class="note"><span class="blabel">Onde cada manual entra</span><p><a href="https://busca.mirandastech.com.br/">Busca</a> produz o corpus; <a href="https://prisma.mirandastech.com.br/">PRISMA</a> tria; este manual mapeia; <a href="https://dados.mirandastech.com.br/">Dados</a> e <a href="https://git.mirandastech.com.br/">Git</a> guardam os arquivos; <a href="https://latex.mirandastech.com.br/">LaTeX</a> põe a figura no texto; <a href="https://manual.mirandastech.com.br/">Uso de IA</a> declara. Hub: <a href="https://www.mirandastech.com.br/pesquisa">mirandastech.com.br/pesquisa</a>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide alt" id="s43" data-title="Erros comuns">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>4 de 9</span></div>
+    <h2 class="rv">Erros comuns — como aparecem e como corrigir</h2>
+    <div class="tw rv"><table><thead><tr><th>Erro</th><th>Como aparece</th><th>Causa</th><th style="width:300px">Correção</th></tr></thead><tbody>
+      <tr><td>Somar bases num mapa</td><td>Exportação do Scopus e do OpenAlex abertas juntas; o VOSviewer recusa, ou o mapa tem duplicados</td><td>«Quanto mais dados, melhor»</td><td><span class="pill p-stop">um mapa por base; deduplicar antes, com critério registrado</span></td></tr>
+      <tr><td>Mapa sem diário</td><td>Figura bonita, sem string, data, <em>n</em> nem limiar</td><td>O mapa foi feito «para ver»</td><td><span class="pill p-stop">os onze itens do método; sem eles, refaça</span></td></tr>
+      <tr><td>Ranking de pessoas</td><td>«Os autores mais influentes são…» a partir de 3 documentos</td><td>Confundir produção com importância</td><td><span class="pill p-stop">Leiden 7 e DORA: descrever, não julgar</span></td></tr>
+      <tr><td>Fator de impacto como qualidade</td><td>«Publicado em periódico de alto impacto, logo…»</td><td>Métrica de periódico usada no artigo</td><td><span class="pill p-stop">DORA; SJR só como descrição, com data</span></td></tr>
+      <tr><td>Nomes não desambiguados</td><td>Dois círculos para o mesmo autor; «AMC Instruments» como autor</td><td>Nomes «como vieram da base»</td><td><span class="pill p-amber">thesaurus; corrigir o CSV; conferir nos documentos</span></td></tr>
+      <tr><td>Ano corrente como alta ou queda</td><td>«A produção dobrou em 2026» (busca em setembro)</td><td>Ano parcial lido como completo</td><td><span class="pill p-amber">marcar como parcial; cortar no último ano completo; dizer a data</span></td></tr>
+      <tr><td>Cluster = tema</td><td>«O campo se divide em dois temas»</td><td>Agrupamento estatístico lido como teoria</td><td><span class="pill p-amber">ler os documentos; rótulo provisório com exemplos</span></td></tr>
+      <tr><td>Limiar sem declarar</td><td>«Mapa de coautoria» sem dizer o mínimo de documentos nem a contagem</td><td>O wizard não grava os parâmetros</td><td><span class="pill p-blue">anotar no diário na hora; declarar no método</span></td></tr>
+      <tr><td>VOSviewer de site não oficial</td><td>Executável baixado de espelho ou de link em mensagem</td><td>Site oficial fora do ar (aviso de 31/08)</td><td><span class="pill p-stop">só vosviewer.com; conferir o arquivo; ou VOSviewer Online</span></td></tr>
+      <tr><td>API sem <code>mailto</code></td><td>Crossref lento ou recusando; OpenAlex sem orçamento</td><td>Requisições sem identificação; busca repetida</td><td><span class="pill p-blue">mailto no Crossref; exportar uma vez e trabalhar no arquivo</span></td></tr>
+      <tr><td>JSON por URL local que não abre</td><td>VOSviewer Online «não encontra o arquivo» com <code>json=</code> apontando para <code>localhost</code></td><td>O app não lê a sua máquina</td><td><span class="pill p-blue">botão «Open» com upload; para compartilhar, endereço público</span></td></tr>
+      <tr><td>Figura do mapa sem legenda completa</td><td>Imagem do mapa sem <em>n</em>, links, clusters, limiar nem software</td><td>A barra de status ficou fora do recorte</td><td><span class="pill p-blue">legenda com itens, links, força total, clusters, limiar, contagem, base, data e versão</span></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<section class="slide" id="s44" data-title="Checklist final">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>5 de 9</span></div>
+    <h2 class="rv">Checklist final: antes de pôr o mapa no texto</h2>
+    <p class="lead rv">Marque conforme concluir. O estado fica salvo neste navegador — não é compartilhado nem enviado a lugar nenhum.</p>
+    <div class="check rv" id="checklist">
+      <div class="check-item"><input type="checkbox" id="c01"><label for="c01"><b>Corpus</b>Vem da busca registrada: string, base, data, período, tipos e <em>n</em> no diário; CSV guardado com o texto</label></div>
+      <div class="check-item"><input type="checkbox" id="c02"><label for="c02"><b>Uma base</b>O mapa usa uma base só; se houve deduplicação entre bases, o critério está registrado (manual de PRISMA)</label></div>
+      <div class="check-item"><input type="checkbox" id="c03"><label for="c03"><b>Exportação</b>Opção certa para a rede pretendida (referências citadas para citação, acoplamento e cocitação); lotes dentro do limite da base; nome da opção no diário</label></div>
+      <div class="check-item"><input type="checkbox" id="c04"><label for="c04"><b>Indicadores</b><code>indicadores_bibliometricos.py</code> rodado; fontes separadas por tipo (repositório × periódico); nomes conferidos; ano corrente marcado como parcial</label></div>
+      <div class="check-item"><input type="checkbox" id="c05"><label for="c05"><b>Citações</b>Fonte e data de toda contagem (Crossref, 09/09/2026); índice h descrito como «do corpus»; nenhum indicador de citação usado para avaliar pessoas</label></div>
+      <div class="check-item"><input type="checkbox" id="c06"><label for="c06"><b>Limpeza</b>Thesaurus (ou correções no CSV) guardado com o mapa; organizações como autor corrigidas; variantes de nome unidas só com evidência</label></div>
+      <div class="check-item"><input type="checkbox" id="c07"><label for="c07"><b>Parâmetros</b>Tipo de link, unidade, contagem (completa ou fracionada), limiar mínimo, número de itens e a resposta ao diálogo dos itens não conectados — anotados na hora</label></div>
+      <div class="check-item"><input type="checkbox" id="c08"><label for="c08"><b>Software</b>VOSviewer baixado só de vosviewer.com (ou VOSviewer Online); versão declarada; referência de Van Eck e Waltman (2010) na lista</label></div>
+      <div class="check-item"><input type="checkbox" id="c09"><label for="c09"><b>Figura</b>Screenshot com legenda completa: base, data, <em>n</em>, unidade, link, contagem, limiar, itens, links, força total, clusters, visualização; faixa da barra de cores se for overlay</label></div>
+      <div class="check-item"><input type="checkbox" id="c10"><label for="c10"><b>Clusters</b>Cada rótulo é provisório, veio da leitura dos documentos e cita exemplos; o que não coube no rótulo está dito</label></div>
+      <div class="check-item"><input type="checkbox" id="c11"><label for="c11"><b>Arquivos</b>CSV, JSON do Crossref, map/network/JSON e a captura versionados (manual de Git) e publicados com o texto quando a licença permite (manual de Dados)</label></div>
+      <div class="check-item"><input type="checkbox" id="c12"><label for="c12"><b>IA declarada</b>Uso do assistente na análise e no texto declarado conforme o manual de Uso de IA</label></div>
+      <div class="check-foot"><span id="check-status">0 de 12</span><button type="button" id="check-reset">limpar</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide alt" id="s45" data-title="Glossário">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>6 de 9</span></div>
+    <h2 class="rv">Glossário</h2>
+    <p class="lead rv">Tudo que aparece no manual sem ser explicado no próprio slide.</p>
+    <div class="gl4 rv"><div><h4 style="margin-top:0">Redes e medidas</h4><dl class="gl"><dt>Bibliometria</dt><dd>Medir a produção científica a partir do que foi publicado: documentos, autores, fontes, citações e as redes entre eles; aqui, descrição de um campo, não avaliação de pessoas.</dd><dt>Corpus</dt><dd>O conjunto de documentos que a busca registrada devolveu; aqui, 236 registros do OpenAlex em 09/09/2026.</dd><dt>Item</dt><dd>Objeto de interesse do mapa: um autor, um termo, uma fonte ou um documento (manual do VOSviewer, cap. 2).</dd><dt>Link</dt><dd>Relação entre dois itens; há no máximo um link por par.</dd><dt>Força do link</dt><dd>Valor positivo do link: nº de documentos coautorados, de documentos em que dois termos coocorrem ou de referências em comum.</dd><dt>Força total (Total link strength)</dt><dd>A soma das forças dos links de um item — ou de toda a rede, na barra de status.</dd><dt>Rede</dt><dd>Itens + links; o que o map file e o network file (ou o JSON) descrevem.</dd><dt>Cluster</dt><dd>Conjunto de itens que o VOSviewer agrupa; cada item pertence a um só cluster, numerado 1, 2, …</dd><dt>Item isolado</dt><dd>Item sem nenhum link na rede; o script imprime quantos há.</dd><dt>Peso (weight)</dt><dd>Atributo numérico do item que dá o tamanho do círculo: «Links», «Total link strength», «Documents», «Citations», «Occurrences».</dd><dt>Score</dt><dd>Atributo numérico do item que dá a cor no overlay: «Pub. year», «Avg. pub. year», «Citations», «Avg. citations», «Norm. citations».</dd><dt>Coautoria</dt><dd>Rede em que dois autores (organizações, países) se ligam quando assinam o mesmo documento.</dd><dt>Coocorrência</dt><dd>Rede em que dois termos ou palavras-chave se ligam quando aparecem no mesmo documento.</dd><dt>Citação (rede de)</dt><dd>Rede em que um documento (fonte, autor…) se liga ao que cita, dentro do corpus.</dd><dt>Acoplamento bibliográfico</dt><dd>Dois documentos se ligam quando citam as mesmas referências; a força é o nº de referências em comum.</dd><dt>Cocitação</dt><dd>Duas referências se ligam quando são citadas juntas pelo mesmo documento.</dd><dt>Contagem completa</dt><dd>Cada coautoria, coocorrência ou referência em comum vale 1 (full counting).</dd><dt>Contagem fracionada</dt><dd>Cada link vale 1/n para os n coautores (fractional counting); reduz o peso de documentos com muitos autores.</dd></dl></div><div><h4 style="margin-top:0">Ferramentas, arquivos e avaliação</h4><dl class="gl"><dt>Network · Overlay · Density</dt><dd>As três visualizações do VOSviewer: cor por cluster; cor por score; mapa de calor de itens ou de clusters.</dd><dt>Limiar</dt><dd>O mínimo de documentos (ou de ocorrências) para um item entrar no mapa; parâmetro do método.</dd><dt>Thesaurus</dt><dd>Arquivo do VOSviewer que une variantes de um mesmo item («h-index» / «Hirsch index») e permite ignorar termos genéricos.</dd><dt>Desambiguação</dt><dd>Decidir se «Silva, J.» e «Silva, João» são a mesma pessoa; sem ela, um autor vira dois círculos.</dd><dt>Map file · network file</dt><dd>Os dois arquivos de texto do VOSviewer: um item por linha (id, label, pesos, scores…) e um link por linha (id1, id2, força).</dd><dt>VOSviewer JSON</dt><dd>Um arquivo só com <code>network.items</code> e <code>network.links</code>; é o que o VOSviewer Online abre pelo botão «Open».</dd><dt>VOSviewer Online</dt><dd>A versão web do VOSviewer (app.vosviewer.com), sem login; abre JSON ou map/network e exporta captura.</dd><dt>Bibliometrix · biblioshiny</dt><dd>Pacote R (5.5.0, GPL-3) para bibliometria e sua interface web «sem código».</dd><dt>DOI</dt><dd>Digital Object Identifier: o identificador que o Crossref usa para devolver citações e referências.</dd><dt>Polite pool</dt><dd>Fila «educada» da API do Crossref: quem se identifica com <code>mailto</code> recebe serviço mais estável.</dd><dt>Acesso aberto</dt><dd>Documento cujo texto completo está disponível sem assinatura; no CSV do OpenAlex, a coluna <code>is_oa</code>.</dd><dt>Índice h do corpus</dt><dd>O maior h tal que h documentos do corpus têm pelo menos h citações; descreve o conjunto, não uma pessoa.</dd><dt>Fator de impacto</dt><dd>Métrica de periódico (média de citações por artigo num período); a DORA pede que não seja usada como medida de qualidade de artigos ou pessoas.</dd><dt>SJR</dt><dd>SCImago Journal Rank: indicador de periódico do SCImago; descreve a revista, não o artigo.</dd><dt>Manifesto de Leiden</dt><dd>Dez princípios para o uso de indicadores na avaliação da pesquisa (Hicks et al., Nature, 2015).</dd><dt>DORA</dt><dd>San Francisco Declaration on Research Assessment (2012): não usar métricas de periódico para avaliar artigos ou pesquisadores.</dd><dt>Diário de busca</dt><dd>O registro (PRISMA-S, <code>BUSCA.md</code>) de string, base, data e <em>n</em>; o mapa herda tudo dele.</dd></dl></div></div>
+  </div>
+</section>
+
+<section class="slide" id="s46" data-title="Referências (1 de 2)">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>7 de 9 · fontes conferidas em 09/09/2026</span></div>
+    <h2 class="rv">Referências (1 de 2): avaliação responsável, guias e as ferramentas</h2>
+    <ol class="refs rv" start="1">
+      <li><span class="rt">HICKS, D.; WOUTERS, P.; WALTMAN, L.; DE RIJCKE, S.; RAFOLS, I. Bibliometrics: The Leiden Manifesto for research metrics. <em>Nature</em>, v. 520, p. 429-431, 2015.</span><a href="https://doi.org/10.1038/520429a">doi.org/10.1038/520429a</a> <a href="https://www.leidenmanifesto.org/">leidenmanifesto.org</a></li>
+      <li><span class="rt">DORA. <em>San Francisco Declaration on Research Assessment</em>. 2012. Acesso em 9 set. 2026.</span><a href="https://sfdora.org/read/">sfdora.org/read</a></li>
+      <li><span class="rt">DONTHU, N.; KUMAR, S.; MUKHERJEE, D.; PANDEY, N.; LIM, W. M. How to conduct a bibliometric analysis: An overview and guidelines. <em>Journal of Business Research</em>, v. 133, p. 285-296, 2021.</span><a href="https://doi.org/10.1016/j.jbusres.2021.04.070">doi.org/10.1016/j.jbusres.2021.04.070</a></li>
+      <li><span class="rt">VAN ECK, N. J.; WALTMAN, L. Software survey: VOSviewer, a computer program for bibliometric mapping. <em>Scientometrics</em>, v. 84, p. 523-538, 2010.</span><a href="https://doi.org/10.1007/s11192-009-0146-3">doi.org/10.1007/s11192-009-0146-3</a></li>
+      <li><span class="rt">VAN ECK, N. J.; WALTMAN, L. <em>VOSviewer Manual</em>. Versão 1.6.20. Leiden: CWTS, 31 out. 2023. Site com aviso de segurança em 9 set. 2026.</span><a href="https://www.vosviewer.com/">vosviewer.com</a></li>
+      <li><span class="rt">VAN ECK, N. J.; WALTMAN, L. <em>VOSviewer Online</em>; <em>VOSviewer Online Docs</em>. CC BY 4.0. Acesso em 9 set. 2026.</span><a href="https://app.vosviewer.com/">app.vosviewer.com</a> <a href="https://app.vosviewer.com/docs/">app.vosviewer.com/docs</a></li>
+      <li><span class="rt">ARIA, M.; CUCCURULLO, C. bibliometrix: An R-tool for comprehensive science mapping analysis. <em>Journal of Informetrics</em>, v. 11, n. 4, p. 959-975, 2017.</span><a href="https://doi.org/10.1016/j.joi.2017.08.007">doi.org/10.1016/j.joi.2017.08.007</a></li>
+      <li><span class="rt">ARIA, M.; CUCCURULLO, C. <em>bibliometrix: Comprehensive Science Mapping Analysis</em>. Versão 5.5.0, 29 ago. 2026. CRAN; site oficial; repositório no GitHub. Acesso em 9 set. 2026.</span><a href="https://cran.r-project.org/package=bibliometrix">cran.r-project.org/package=bibliometrix</a> <a href="https://www.bibliometrix.org/">bibliometrix.org</a> <a href="https://github.com/massimoaria/bibliometrix">github.com/massimoaria/bibliometrix</a></li>
+      <li><span class="rt">CHEN, C. CiteSpace II: Detecting and visualizing emerging trends and transient patterns in scientific literature. <em>Journal of the American Society for Information Science and Technology</em>, 2006. Site do CiteSpace (7.0.2) acessado em 9 set. 2026.</span><a href="https://doi.org/10.1002/asi.20317">doi.org/10.1002/asi.20317</a> <a href="https://citespace.podia.com/">citespace.podia.com</a></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide alt" id="s47" data-title="Referências (2 de 2)">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar<span>8 de 9 · fontes conferidas em 09/09/2026</span></div>
+    <h2 class="rv">Referências (2 de 2): bases, APIs, indicadores de periódico e os manuais irmãos</h2>
+    <ol class="refs rv" start="10">
+      <li><span class="rt">OPENALEX. <em>OpenAlex Help Center</em>; API (api.openalex.org). Acesso em 9 set. 2026 — resposta da API com «Rate limit exceeded / Insufficient budget» nessa data.</span><a href="https://help.openalex.org/">help.openalex.org</a></li>
+      <li><span class="rt">CROSSREF. <em>REST API</em> (api.crossref.org/works/&lt;DOI&gt;). Acesso em 9 set. 2026.</span><a href="https://api.crossref.org/">api.crossref.org</a></li>
+      <li><span class="rt">CLARIVATE. <em>Web of Science</em>. Tela de login acessada em 9 set. 2026.</span><a href="https://www.webofscience.com/">webofscience.com</a></li>
+      <li><span class="rt">ELSEVIER. <em>Scopus</em>. Bloqueado pela verificação da Cloudflare para o navegador automatizado em 9 set. 2026.</span><a href="https://www.scopus.com/">scopus.com</a></li>
+      <li><span class="rt">DIGITAL SCIENCE. <em>Dimensions</em>. Acesso em 9 set. 2026.</span><a href="https://www.dimensions.ai/">dimensions.ai</a></li>
+      <li><span class="rt">CAMBIA. <em>The Lens</em>. Acesso em 9 set. 2026.</span><a href="https://www.lens.org/">lens.org</a></li>
+      <li><span class="rt">NATIONAL LIBRARY OF MEDICINE. <em>PubMed</em>. Acesso em 9 set. 2026.</span><a href="https://pubmed.ncbi.nlm.nih.gov/">pubmed.ncbi.nlm.nih.gov</a></li>
+      <li><span class="rt">SCIMAGO. <em>SCImago Journal &amp; Country Rank</em>. Acesso em 9 set. 2026.</span><a href="https://www.scimagojr.com/">scimagojr.com</a></li>
+      <li><span class="rt">WIKIPEDIA. <em>Leiden Manifesto</em> (títulos dos dez princípios conferidos). Acesso em 9 set. 2026.</span><a href="https://en.wikipedia.org/wiki/Leiden_Manifesto">en.wikipedia.org/wiki/Leiden_Manifesto</a></li>
+      <li><span class="rt">MIRANDASTECH. <em>Busca em bases abertas: passo a passo</em> (o corpus de 236 documentos e o <code>buscar_openalex.py</code>); <em>PRISMA</em>; <em>Dados</em>; <em>Git</em>. Manuais irmãos. Acesso em 9 set. 2026.</span><a href="https://busca.mirandastech.com.br/">busca.mirandastech.com.br</a> <a href="https://prisma.mirandastech.com.br/">prisma.mirandastech.com.br</a> <a href="https://dados.mirandastech.com.br/">dados.mirandastech.com.br</a> <a href="https://git.mirandastech.com.br/">git.mirandastech.com.br</a></li>
+    </ol>
+    <div class="note rv"><span class="blabel">Sobre as datas</span><p>Versões (manual do VOSviewer 1.6.20; bibliometrix 5.5.0; CiteSpace 7.0.2), limites de exportação, nomes de opções e a mensagem da API do OpenAlex foram lidos nas páginas acima em 09/09/2026 e mudam sem aviso. Não há versão atual do VOSviewer desktop, preços de Scopus, Web of Science, Dimensions ou CiteSpace, tamanhos de acervo nem valores da tabela de preços do OpenAlex neste manual, porque não foram conferidos nessa data.</p></div>
+  </div>
+</section>
+
+<section class="slide" id="s48" data-title="Como citar, uso de IA e licença">
+  <div class="inner">
+    <div class="kicker-part rv">Relatar e fechar · último slide<span>9 de 9</span></div>
+    <h2 class="rv">Como citar este manual, declaração de uso de IA e licença</h2>
+    <div class="two rv">
+      <div>
+        <div class="case"><span class="blabel">Como citar</span><p>MATIAS, J. P. M. <em>Bibliometria com VOSviewer e Bibliometrix: passo a passo.</em> MirandasTech, v1.0, set. 2026. CC BY 4.0.</p><span class="src">Este manual: <a href="https://bibliometria.mirandastech.com.br/">bibliometria.mirandastech.com.br</a> (PDF em <a href="https://bibliometria.mirandastech.com.br/manual.pdf">/manual.pdf</a>). Manuais irmãos: <a href="https://dados.mirandastech.com.br/">dados.mirandastech.com.br</a> · <a href="https://git.mirandastech.com.br/">git.mirandastech.com.br</a> · <a href="https://latex.mirandastech.com.br/">latex.mirandastech.com.br</a> · <a href="https://busca.mirandastech.com.br/">busca.mirandastech.com.br</a> · <a href="https://prisma.mirandastech.com.br/">prisma.mirandastech.com.br</a> · <a href="https://zotero.mirandastech.com.br/">zotero.mirandastech.com.br</a> · <a href="https://metodologia.mirandastech.com.br/">metodologia.mirandastech.com.br</a> · <a href="https://notebook.mirandastech.com.br/">notebook.mirandastech.com.br</a> · <a href="https://manual.mirandastech.com.br/">manual.mirandastech.com.br</a> · <a href="https://plugin.mirandastech.com.br/">plugin.mirandastech.com.br</a> · hub: <a href="https://www.mirandastech.com.br/pesquisa">mirandastech.com.br/pesquisa</a></span></div>
+        <div class="rule-box"><span class="blabel">Licença</span><p>Conteúdo, capturas e os scripts <code>indicadores_bibliometricos.py</code> e <code>mapa_vosviewer.py</code>: CC BY 4.0 — use, copie, adapte e redistribua com atribuição. O VOSviewer «pode ser usado livremente para qualquer finalidade»; a documentação do VOSviewer Online é CC BY 4.0; o bibliometrix é GPL-3. VOSviewer e CWTS, Bibliometrix, Clarivate (Web of Science), Elsevier (Scopus), Digital Science (Dimensions), Cambia (Lens), OpenAlex e OurResearch, Crossref, SCImago, CiteSpace, PubMed e as demais ferramentas e serviços citados são marcas e projetos de terceiros, sem vínculo nem endosso deste manual.</p></div>
+      </div>
+      <div>
+        <div class="note"><span class="blabel">Declaração de uso de IA</span><p>Este manual foi escrito com assistência de IA (Claude, Anthropic) na estruturação, na redação, na automação das capturas de tela e na execução dos scripts, sob as regras do manual de Uso de IA na pesquisa científica. Todos os fatos, números, nomes de botões, limites, versões e referências foram conferidos nas fontes indicadas em 09/09/2026. Nenhuma captura foi feita com login. O corpus é real e aberto, exportado do OpenAlex em 09/09/2026; os mapas foram abertos de verdade no VOSviewer Online. O VOSviewer desktop e o Bibliometrix não foram executados e são descritos pela documentação oficial. Decisões de conteúdo, seleção das fontes e responsabilidade pelo texto são do autor.</p></div>
+        <div class="colophon" style="margin-top:12px;font-size:11px">Sem garantia: interfaces, limites, orçamentos de API e versões mudam; cada fato traz a data em que foi verificado. Quando a sua tela divergir, vale a tela. A escolha da base, dos limiares e da interpretação dos clusters, a citação das ferramentas no seu texto e a declaração de uso de IA da sua pesquisa são seus e seguem o seu programa, o seu orientador e a biblioteca da sua instituição. Nenhum indicador deste manual serve para avaliar pessoas.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<script>
+
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var tot = slides.length; document.getElementById('tot').textContent = tot; var ns = document.getElementById('nslides'); if (ns) ns.textContent = tot;
+  var cur = document.getElementById('cur'), prog = document.getElementById('prog');
+  var menu = document.getElementById('menu'), scrim = document.getElementById('scrim'), menubtn = document.getElementById('menubtn');
+
+  /* sumário gerado a partir dos slides */
+  var html = '', grp = '';
+  slides.forEach(function(s, i){
+    var t = s.getAttribute('data-title') || ('Slide ' + (i+1));
+    if (s.classList.contains('divider')) { html += '<div class="grp">' + t + '</div>'; return; }
+    if (s.classList.contains('cover')) { html += '<div class="grp">Início</div>'; }
+    html += '<a href="#' + s.id + '" data-i="' + i + '"><span class="n">' + String(i+1).padStart(2,'0') + '</span><span>' + t + '</span></a>';
+  });
+  document.getElementById('menulist').innerHTML = html;
+  document.getElementById('menuclose').addEventListener('click', function(){ toggleMenu(false); });
+  var links = Array.prototype.slice.call(menu.querySelectorAll('a'));
+  function toggleMenu(open){ menu.classList.toggle('open', open); scrim.classList.toggle('on', open); }
+  menubtn.addEventListener('click', function(){ toggleMenu(!menu.classList.contains('open')); });
+  scrim.addEventListener('click', function(){ toggleMenu(false); });
+  links.forEach(function(a){ a.addEventListener('click', function(){ toggleMenu(false); }); });
+
+  /* slide ativo: contador, progresso, revelação, sumário */
+  var active = 0;
+  function setActive(i){
+    active = i; cur.textContent = i + 1; prog.style.width = ((i+1)/tot*100) + '%';
+    links.forEach(function(a){ a.classList.toggle('on', +a.getAttribute('data-i') === i); });
+    var on = menu.querySelector('a.on'); if (on && menu.classList.contains('open')) on.scrollIntoView({block:'nearest'});
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.12 });
+    slides.forEach(function(s){ io.observe(s); });
+  } else { slides.forEach(function(s){ s.classList.add('in'); }); }
+  /* slide ativo = o que ocupa mais área visível */
+  var ticking = false;
+  function recompute(){
+    ticking = false; var vh = window.innerHeight, best = 0, bi = active;
+    slides.forEach(function(s, i){ var r = s.getBoundingClientRect(); var vis = Math.min(r.bottom, vh) - Math.max(r.top, 0); if (vis > best) { best = vis; bi = i; } });
+    if (bi !== active) setActive(bi);
+  }
+  window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(recompute); } }, { passive: true });
+  window.addEventListener('resize', recompute); recompute(); slides[0].classList.add('in');
+
+  /* ajuste de escala: cada slide cabe na tela (como num programa de apresentação) */
+  function fitAll(){
+    if (window.innerWidth <= 900) { slides.forEach(function(s){ var i = s.querySelector('.inner'); if (i) i.style.zoom = ''; s.classList.add('fit'); }); return; }
+    var avail = window.innerHeight - 52;
+    slides.forEach(function(s){
+      var inner = s.querySelector('.inner'); if (!inner || s.classList.contains('divider') || s.classList.contains('cover')) return;
+      inner.style.zoom = '1'; s.classList.remove('fit');
+      var need = inner.scrollHeight; if (need <= avail) { s.classList.add('fit'); return; }
+      var z = Math.max(0.75, avail / need); inner.style.zoom = z.toFixed(3);
+      if (inner.scrollHeight * z <= avail + 2) s.classList.add('fit');
+    });
+  }
+  window.addEventListener('resize', fitAll); window.addEventListener('load', fitAll); fitAll();
+  /* cards expansíveis abrem em janela sobreposta, sem mudar a altura do slide */
+  var modal = document.getElementById('modal'), mbody = document.getElementById('modal-body'), mtitle = document.getElementById('modal-title');
+  function closeModal(){ modal.classList.remove('on'); mbody.innerHTML = ''; }
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  modal.addEventListener('click', function(ev){ if (ev.target === modal) closeModal(); });
+  document.querySelectorAll('details.more').forEach(function(d){
+    var s = d.querySelector('summary'), body = d.querySelector(':scope > div');
+    s.addEventListener('click', function(ev){
+      if (window.matchMedia('print').matches) return;
+      ev.preventDefault(); d.open = false;
+      mtitle.textContent = s.textContent.replace(/^detalhes\s*—\s*/i, '').trim() || 'detalhes';
+      mbody.innerHTML = body.innerHTML; modal.classList.add('on'); attachCopy(mbody);
+    });
+  });
+  /* botão de copiar em código, terminal e prompt */
+  function attachCopy(root){
+    root.querySelectorAll('.code, .term').forEach(function(box){
+      if (box.querySelector(':scope > .copy')) return;
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'copy'; b.textContent = 'copiar'; b.setAttribute('aria-label', 'Copiar conteúdo');
+      b.addEventListener('click', function(){
+        var pre = box.querySelector('pre'); var txt = pre ? pre.innerText : box.innerText;
+        function done(){ b.textContent = 'copiado ✓'; b.classList.add('ok'); setTimeout(function(){ b.textContent = 'copiar'; b.classList.remove('ok'); }, 1600); }
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt); done(); }); } else { fallback(txt); done(); }
+      });
+      box.appendChild(b);
+    });
+  }
+  function fallback(txt){ var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch(e){} document.body.removeChild(ta); }
+  attachCopy(document);
+  /* popover do glossário */
+  var gpop = document.getElementById('gpop'), gcur = null;
+  function showPop(el){ gpop.innerHTML = '<b>' + el.getAttribute('data-t') + '</b>' + el.getAttribute('data-d'); gpop.classList.add('on');
+    var r = el.getBoundingClientRect(), pw = Math.min(340, window.innerWidth - 24); gpop.style.maxWidth = pw + 'px';
+    var left = Math.max(12, Math.min(r.left, window.innerWidth - pw - 12)); gpop.style.left = left + 'px';
+    var ph = gpop.offsetHeight; var top = r.bottom + 8; if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8); gpop.style.top = top + 'px'; gcur = el; }
+  function hidePop(){ gpop.classList.remove('on'); gcur = null; }
+  document.querySelectorAll('.gterm').forEach(function(el){
+    el.addEventListener('mouseenter', function(){ showPop(el); }); el.addEventListener('mouseleave', hidePop);
+    el.addEventListener('focus', function(){ showPop(el); }); el.addEventListener('blur', hidePop);
+    el.addEventListener('click', function(ev){ ev.stopPropagation(); if (gcur === el) hidePop(); else showPop(el); });
+  });
+  document.addEventListener('click', function(){ if (gcur) hidePop(); }); window.addEventListener('scroll', function(){ if (gcur) hidePop(); }, { passive: true });
+
+  function go(i){ i = Math.max(0, Math.min(tot-1, i)); window.scrollTo({ top: slides[i].offsetTop, behavior: 'smooth' }); }
+  document.getElementById('prev').addEventListener('click', function(){ go(active-1); });
+  document.getElementById('next').addEventListener('click', function(){ go(active+1); });
+  document.addEventListener('keydown', function(ev){
+    if (ev.target && /input|textarea|select/i.test(ev.target.tagName)) return;
+    if (ev.key === 'ArrowDown' || ev.key === 'PageDown' || ev.key === ' ' || ev.key === 'ArrowRight') { ev.preventDefault(); go(active+1); }
+    else if (ev.key === 'ArrowUp' || ev.key === 'PageUp' || ev.key === 'ArrowLeft') { ev.preventDefault(); go(active-1); }
+    else if (ev.key === 'Home') { go(0); } else if (ev.key === 'End') { go(tot-1); }
+    else if (ev.key === 'Escape') { toggleMenu(false); closeModal(); }
+  });
+
+  /* checklist — conveniência por leitor, só neste navegador */
+  var KEY = 'mirandastech-bibliometria-checklist-v1';
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('#checklist input[type=checkbox]'));
+  var status = document.getElementById('check-status');
+  function load(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+  function save(st){ try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+  function paint(){ var n = 0; boxes.forEach(function(b){ var it = b.closest('.check-item'); if (b.checked) { n++; it.classList.add('done'); } else { it.classList.remove('done'); } }); if (status) status.textContent = n + ' de ' + boxes.length; }
+  var st = load(); boxes.forEach(function(b){ b.checked = !!st[b.id]; b.addEventListener('change', function(){ var s = load(); s[b.id] = b.checked; save(s); paint(); }); }); paint();
+  var reset = document.getElementById('check-reset'); if (reset) reset.addEventListener('click', function(){ boxes.forEach(function(b){ b.checked = false; }); save({}); paint(); });
+})();
+</script>
+<script>
+(function(){
+  var lb = document.createElement('div'); lb.className = 'lightbox'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
+  lb.innerHTML = '<span class="lb-hint">clique fora ou Esc para fechar</span><button type="button" class="lb-close" aria-label="Fechar">×</button><figure style="margin:0;display:contents"><img alt=""><figcaption hidden></figcaption></figure>';
+  document.body.appendChild(lb);
+  var img = lb.querySelector('img'), cap = lb.querySelector('figcaption');
+  function open(src, alt, text){ img.src = src; img.alt = alt || ''; if (text) { cap.textContent = text; cap.hidden = false; } else { cap.hidden = true; } lb.classList.add('on'); document.body.style.overflow = 'hidden'; }
+  function close(){ lb.classList.remove('on'); img.removeAttribute('src'); document.body.style.overflow = ''; }
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if (t.tagName === 'IMG' && t.closest('.shot')) {
+      var fig = t.closest('figure'), fc = fig && fig.querySelector('figcaption');
+      open(t.currentSrc || t.src, t.alt, fc ? fc.textContent.replace(/\s+/g,' ').trim() : '');
+    }
+  });
+  lb.addEventListener('click', function(ev){ if (ev.target !== img) close(); });
+  document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && lb.classList.contains('on')) close(); });
+})();
+</script>
